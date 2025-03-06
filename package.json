@@ -1,0 +1,32 @@
+{
+  "name": "nitro-spec-monorepo",
+  "version": "1.0.0",
+  "scripts": {
+    "clean": " nx run-many --targets=clean && rm -rf node_modules",
+    "build": "nx run-many --targets=build --output-style=stream",
+    "dev": "nx run-many --targets=dev --output-style=stream",
+    "lint": "nx run-many --targets=lint --output-style=stream",
+    "orval": "nx run-many --targets=orval --output-style=stream",
+    "format": "nx run-many --targets=format --output-style=stream",
+    "reset": "nx reset"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.6.1",
+  "devDependencies": {
+    "@nx/workspace": "20.4.6"
+  },
+  "volta": {
+    "node": "20.18.0"
+  },
+  "dependencies": {
+    "nx": "^20.4.6"
+  }
+}
