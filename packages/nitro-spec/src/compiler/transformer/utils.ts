@@ -24,9 +24,11 @@ export const getMethodFromFileName = (fileName: string) => {
   const method: Method =
     methods.find((method) => fileName.includes(method)) ?? "get";
 
+  const routePart = fileName.replace("." + method, "").replace("index", "");
+
   return {
     method,
-    routePart: fileName.replace("." + method, ""),
+    routePart: routePart === "." ? "/" : routePart,
   };
 };
 

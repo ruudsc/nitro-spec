@@ -9,20 +9,23 @@ import {
   createError,
   defineEventHandler,
   _RequestMiddleware,
+  EventHandler,
 } from "h3";
 import consola from "consola";
 import { colors } from "consola/utils";
+import { registerRoute } from "../utils/registerRoute";
+import { isValidMethod, Method } from "../utils/isValidMethod";
 
 type Event = H3Event<Request>;
 
-type ValidatorResponseTypes =
+export type ValidatorResponseTypes =
   | z.ZodNull
   | z.ZodType
   | z.AnyZodObject
   | null
   | z.ZodVoid;
 
-type RouteMeta<
+export type RouteMeta<
   TPath extends z.AnyZodObject = z.AnyZodObject,
   TQuery extends z.AnyZodObject = z.AnyZodObject,
   TBody extends z.ZodAny = z.ZodAny,
@@ -43,19 +46,40 @@ export function defineMeta<
   TQuery extends z.AnyZodObject = z.AnyZodObject,
   TBody extends z.ZodAny = z.ZodAny,
   TResponse extends ValidatorResponseTypes = z.ZodNull,
-  TPathData = NoInfer<z.infer<TPath>>,
-  TQueryData = NoInfer<z.infer<TQuery>>,
-  TBodyData = NoInfer<z.infer<TBody>>,
-  TResponseData = NoInfer<
-    TResponse extends ZodType ? z.infer<TResponse> : null
-  >,
+  TPathData = z.infer<TPath>,
+  TQueryData = z.infer<TQuery>,
+  TBodyData = z.infer<TBody>,
 >(meta: RouteMeta<TPath, TQuery, TBody, TResponse>) {
   const {
     body = z.object({}),
     query = z.object({}),
     path = z.object({}),
-    response = null,
+    response = z.null(),
   } = meta;
+
+  /** values injected by the rollup plugin */
+  const { __path, __method } = meta as unknown as {
+    __path: string;
+    __method: Method;
+  };
+
+  if (isValidMethod(__method) === false) {
+    throw new Error(`Invalid method: ${__method} for ${__path}`);
+  }
+
+  const operationId = meta.operationId || __path;
+
+  registerRoute({
+    method: __method,
+    path: __path as any,
+    operationId,
+    response: response as any,
+    query,
+    body: body as any,
+    description: meta.description,
+    summary: meta.summary,
+    title: meta.title,
+  });
 
   const getMeta = (event: Event) => {
     const { method, path } = event;
@@ -106,18 +130,17 @@ export function defineMeta<
     consola.log(meta.prefix, "Validating response");
 
     try {
-      if (response == null && eventResponse != null) {
+      if (response == null && eventResponse?.body != null) {
         throw Error("Response is not null but response schema is null");
       } else if (response != null) {
-        response.parse(eventResponse);
+        response.parse(eventResponse.body);
       } else {
         // TODO: Add a warning that response is null and response is not validated
         consola.debug("Response is null and response is not validated");
       }
     } catch (e) {
       consola.error(meta.prefix, "Error validating response");
-      consola.error(e);
-
+      consola.error(JSON.stringify(e, null, 2));
       throw createError({
         statusCode: 500,
         statusMessage: "Internal Server Error",
@@ -127,7 +150,7 @@ export function defineMeta<
 
   return {
     defineEventHandler: (
-      handler: Handler<TPathData, TQueryData, TBodyData, TResponseData>,
+      handler: Handler<TPathData, TQueryData, TBodyData, TResponse>,
     ) =>
       defineEventHandler({
         onBeforeResponse: responseValidator,
@@ -141,9 +164,23 @@ export function defineMeta<
 }
 
 export type MaybePromise<T> = T | Promise<T>;
-export type Handler<TPath, TQuery, TBody, TResponse> = (
+export type Handler<
+  TPath,
+  TQuery,
+  TBody,
+  TResponse extends ValidatorResponseTypes,
+> = (
   event: Event,
   params: TPath,
   query: TQuery,
   body: TBody,
-) => MaybePromise<TResponse>;
+) => Expand<
+  MaybePromise<TResponse extends z.ZodAny ? z.infer<TResponse> : null>
+>;
+
+type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
+
+type DefineEventHandler = (handler: Handler<any, any, any, any>) => any;
+
+export type InferResponseType<T extends DefineEventHandler> =
+  DefineEventHandler;

@@ -4,12 +4,9 @@ import {
   extractParams,
   fileExtensionRegex,
   getMethodFromFileName,
-  ImportAliases,
 } from "./utils";
-import { doJitiStuff } from "./resolver";
+
 import consola from "consola";
-import { TSConfig } from "pkg-types";
-import { Jiti } from "jiti/lib/types";
 
 export function replaceBrackets(route: string): string {
   return route.replace(/\[([a-zA-Z0-9_]+)\]/g, "{$1}");
@@ -30,6 +27,7 @@ export const extractRouteMetadata = (fullPath: string) => {
   const pathParameters = extractParams(fileRoute);
 
   return {
+    fileName,
     pathParameters,
     fileRoute,
     urlRoute,
@@ -37,7 +35,16 @@ export const extractRouteMetadata = (fullPath: string) => {
   };
 };
 
-export const scanFileMeta = (path: string, code: string) => {
+export type Meta = {
+  id: string;
+  filename: string;
+  pathParameters: Record<string, string>;
+  fileRoute: string;
+  urlRoute: string;
+  method: string;
+};
+
+export const scanFileMeta = (path: string, code: string): Meta => {
   const relativePath = path.split("/routes/")?.[1];
 
   if (!relativePath) {
@@ -45,7 +52,14 @@ export const scanFileMeta = (path: string, code: string) => {
   }
 
   const meta = extractRouteMetadata(relativePath);
-  consola.log("route-meta:", meta);
+  // consola.log("route-meta:", meta);
 
-  return { meta };
+  return {
+    id: path,
+    filename: meta.fileName,
+    fileRoute: meta.fileRoute,
+    urlRoute: meta.urlRoute,
+    pathParameters: meta.pathParameters,
+    method: meta.method,
+  };
 };

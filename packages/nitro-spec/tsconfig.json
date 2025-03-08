@@ -7,7 +7,12 @@
     "resolveJsonModule": true,
     "strict": true,
     "strictNullChecks": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "skipLibCheck": true
   },
-  "exclude": ["dist"]
+  "include": ["src"],
+  "exclude": ["*.test.ts", "dist", "node_modules"]
 }

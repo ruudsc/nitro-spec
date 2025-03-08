@@ -3,20 +3,15 @@ import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { scanFileMeta } from "./routes";
 import { catchAllRouteRegex } from "./utils";
-import { createJitiInstance, type JitiInstance } from "./runner";
-import acorn from "acorn";
 import { Options } from "../factories/types";
+import { transformer } from "./transformer";
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (
   options,
 ) => {
-  let jiti: JitiInstance;
-
   return {
     name: "nitro-openapi-plugin",
     sourcemap: false,
-    async buildStart() {
-      // jiti = await createJitiInstance();
-    },
+    async buildStart() {},
     transformInclude(id) {
       if (id.startsWith("\0")) {
         return false;
@@ -28,25 +23,20 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
       }
 
       const isRoute = id.includes("/routes/");
-      return isRoute && id.includes("nitro-test");
+      return isRoute;
     },
 
     async transform(code, id) {
       const meta = await scanFileMeta(id, code);
+      const result = transformer(code, meta);
+      /* 
+      this.emitFile({
+        type: "asset",
+        fileName: meta.filename + ".ts.map",
+        source: result.sourcemap,
+      }); */
 
-      const program = acorn.parse(code, {
-        ecmaVersion: 2020,
-        sourceType: "module",
-        locations: true,
-        onComment: (block, text, start, end) => {
-          console.log(block, text, start, end);
-        },
-      });
-
-      return code;
-    },
-    buildEnd() {
-      console.log("buildEnd");
+      return result.code;
     },
   };
 };

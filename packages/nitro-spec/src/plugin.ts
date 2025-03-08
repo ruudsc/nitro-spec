@@ -1,23 +1,37 @@
 import { type NitroApp } from "nitropack";
-import { openApiJsonEndpoint } from "./routes/openapi.json";
-import { openapiYamlRoute } from "./routes/openapi.yaml";
+import { createOpenApiJsonEndpoint } from "./routes/openapi.json";
+import { createOpenapiYamlRoute } from "./routes/openapi.yaml";
 import { createOpenApiRoute } from "./routes/openapi";
-type NitroSpecOptions = {
+import { OpenApiOptions } from "./routes/openApiOptions";
+import { CreateRedocRoute } from "./routes/redoc";
+type NitroSpecOptions = OpenApiOptions & {
   app: NitroApp;
-  base?: string;
+  baseUrl?: string;
 };
 
 export const createNitroSpecPlugin = (args: NitroSpecOptions) => {
-  const { app, base = "" } = args;
+  const { app, baseUrl = "/" } = args;
 
-  app.router.add(`${base}/openapi.json`, openApiJsonEndpoint);
-  app.router.add(`${base}/openapi.yaml`, openapiYamlRoute);
-  app.router.add(
-    `${base}/openapi`,
-    createOpenApiRoute({
-      url: `${base}/openapi`,
-      title: "Nitro Server Routes",
+  const normalised = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+
+  app.router.get(`${normalised}/openapi.json`, createOpenApiJsonEndpoint(args));
+  app.router.get(`${normalised}/openapi.yaml`, createOpenapiYamlRoute());
+  app.router.get(
+    `${normalised}/openapi/redoc`,
+    CreateRedocRoute({
+      title: args.title ?? "Nitro Server Routes",
       description: "OpenAPI documentation for Nitro Server Routes",
+      baseUrl: `${normalised}`,
+    }),
+  );
+
+  app.router.get(
+    `${normalised}/openapi`,
+    createOpenApiRoute({
+      baseUrl: `${normalised}/openapi.json`,
+      title: args.title ?? "Nitro Server Routes",
+      description:
+        args.description ?? "OpenAPI documentation for Nitro Server Routes",
     }),
   );
 };

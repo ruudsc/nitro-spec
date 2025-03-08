@@ -1,17 +1,19 @@
-import { defineEventHandler } from "h3";
+import { defineEventHandler, EventHandler } from "h3";
 
 export type OpenApiRoute = {
-  url: string;
+  baseUrl: string;
   title: string;
   description: string;
 };
 
-export const createOpenApiRoute = (options: OpenApiRoute) =>
+export const createOpenApiRoute = (
+  options: OpenApiRoute,
+): EventHandler<Request, unknown> =>
   defineEventHandler((event) => {
-    const { description, title, url } = options;
+    const { description, title, baseUrl } = options;
 
     const scalarConfig = {
-      spec: { url },
+      spec: { url: baseUrl },
     };
 
     return html`<!doctype html>

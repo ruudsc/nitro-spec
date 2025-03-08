@@ -1,23 +1,41 @@
+import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 import consola from "consola";
-import { createError, defineEventHandler } from "h3";
+import { createError, defineEventHandler, EventHandler } from "h3";
+import { registry } from "../utils/registry";
+import { OpenApiOptions } from "./openApiOptions";
 
-export const openApiJsonEndpoint = defineEventHandler(async () => {
-  // const registry = useApiRegistry();
+export const createOpenApiJsonEndpoint = (
+  options: OpenApiOptions,
+): EventHandler<Request, unknown> =>
+  defineEventHandler(async () => {
+    try {
+      const generator = new OpenApiGeneratorV3(registry.definitions);
+      const {
+        title = "Nitro Server Routes",
+        description,
+        contact,
+        license,
+        termsOfService,
+        servers,
+      } = options;
 
-  try {
-    // const generator = new OpenApiGeneratorV3(registry.definitions);
+      const document = generator.generateDocument({
+        openapi: "3.0.0",
+        info: {
+          title,
+          version: "0.1.0",
+          description,
+          contact,
+          license,
+          termsOfService,
+        },
+        servers,
+      });
 
-    /*  const document = generator.generateDocument({
-      openapi: "3.0.0",
-      info: { title: "Nitro Server Routes", version: "0.1.0" },
-      servers: [{ url: "http://localhost:8000" }],
-    });
- */
-
-    return document;
-  } catch (e) {
-    consola.error(e);
-    // return JSON.stringify(registry, null, 2);
-    createError({ statusCode: 500, statusMessage: "Internal Server Error" });
-  }
-});
+      return document;
+    } catch (e) {
+      consola.error(e);
+      // return JSON.stringify(registry, null, 2);
+      createError({ statusCode: 500, statusMessage: "Internal Server Error" });
+    }
+  });

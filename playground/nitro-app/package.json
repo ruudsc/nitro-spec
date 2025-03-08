@@ -1,6 +1,7 @@
 {
   "name": "@nitro-app/test-project",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nitro build",
     "clean": "rm -rf .nuxt .output node_modules",
@@ -9,10 +10,13 @@
     "preview": "node .output/server/index.mjs"
   },
   "devDependencies": {
+    "nitro-spec": "workspace:*",
     "nitropack": "catalog:",
     "rollup": "4.34.9",
-    "nitro-spec": "workspace:*",
-    "zod": "catalog:",
-    "zod-openapi": "catalog:"
+    "zod": "catalog:"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.0",
+    "recast": "^0.23.11"
   }
 }
