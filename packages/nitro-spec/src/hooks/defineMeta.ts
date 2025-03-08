@@ -1,5 +1,5 @@
 // import "zod-openapi/extend";
-import { z, ZodType } from "zod";
+import { z } from "zod";
 import {
   H3Event,
   getValidatedQuery,
@@ -9,7 +9,6 @@ import {
   createError,
   defineEventHandler,
   _RequestMiddleware,
-  EventHandler,
 } from "h3";
 import consola from "consola";
 import { colors } from "consola/utils";
@@ -49,6 +48,7 @@ export function defineMeta<
   TPathData = z.infer<TPath>,
   TQueryData = z.infer<TQuery>,
   TBodyData = z.infer<TBody>,
+  TResponseData = TResponse extends z.AnyZodObject ? z.infer<TResponse> : never,
 >(meta: RouteMeta<TPath, TQuery, TBody, TResponse>) {
   const {
     body = z.object({}),
@@ -150,7 +150,7 @@ export function defineMeta<
 
   return {
     defineEventHandler: (
-      handler: Handler<TPathData, TQueryData, TBodyData, TResponse>,
+      handler: Handler<TPathData, TQueryData, TBodyData, TResponseData>,
     ) =>
       defineEventHandler({
         onBeforeResponse: responseValidator,
@@ -164,23 +164,13 @@ export function defineMeta<
 }
 
 export type MaybePromise<T> = T | Promise<T>;
-export type Handler<
-  TPath,
-  TQuery,
-  TBody,
-  TResponse extends ValidatorResponseTypes,
-> = (
+export type Handler<TPath, TQuery, TBody, TResponse> = (
   event: Event,
   params: TPath,
   query: TQuery,
   body: TBody,
-) => Expand<
-  MaybePromise<TResponse extends z.ZodAny ? z.infer<TResponse> : null>
+) => MaybePromise<
+  Expand<TResponse extends z.AnyZodObject ? z.infer<TResponse> : TResponse>
 >;
 
 type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
-
-type DefineEventHandler = (handler: Handler<any, any, any, any>) => any;
-
-export type InferResponseType<T extends DefineEventHandler> =
-  DefineEventHandler;
