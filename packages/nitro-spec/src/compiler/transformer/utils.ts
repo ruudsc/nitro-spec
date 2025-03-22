@@ -21,14 +21,22 @@ const methods = [
 type Method = (typeof methods)[number];
 
 export const getMethodFromFileName = (fileName: string) => {
-  const method: Method =
-    methods.find((method) => fileName.includes(method)) ?? "get";
+  const method: Method | undefined = methods.find((method) =>
+    fileName.includes(method),
+  );
 
-  const routePart = fileName.replace("." + method, "").replace("index", "");
+  if (!method) {
+    return {
+      method: "get",
+      routePart: fileName,
+    };
+  }
+
+  const routePart = fileName.replace("." + method, "");
 
   return {
     method,
-    routePart: routePart === "." ? "/" : routePart,
+    routePart: routePart,
   };
 };
 

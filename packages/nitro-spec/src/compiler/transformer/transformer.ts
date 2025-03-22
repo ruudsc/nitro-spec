@@ -1,6 +1,6 @@
 import recast from "recast";
 import tsParser from "recast/parsers/typescript";
-import { Meta } from "./routes";
+import { Meta } from "./scanPathMeta";
 
 type ObjectProperty = recast.types.namedTypes.ObjectProperty;
 
@@ -38,9 +38,9 @@ export const transformer = (code: string, meta: Meta) => {
     },
   });
 
-  // const contents = getContents(code, callExpression.node);
   const printed = recast.print(ast, {
-    sourceFileName: meta.id + ".map",
+    sourceFileName: meta.id,
+    sourceMapName: meta.id + ".map",
   });
 
   return {
