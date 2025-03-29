@@ -14,7 +14,9 @@ export const transformer = (code: string, meta: Meta) => {
   recast.visit(ast, {
     visitCallExpression: function (path) {
       const isDefineMeta =
-        "name" in path.node.callee && path.node.callee.name === "defineMeta";
+        "name" in path.node.callee &&
+        (path.node.callee.name === "defineMeta" ||
+          path.node.callee.name === "defineMetaRaw");
 
       if (!isDefineMeta) {
         return false;

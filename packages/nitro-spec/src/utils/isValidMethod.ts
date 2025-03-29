@@ -11,6 +11,6 @@ export const methods = [
   "head",
   "options",
   "trace",
-];
+] as const;
 
 export type Method = (typeof methods)[number];
