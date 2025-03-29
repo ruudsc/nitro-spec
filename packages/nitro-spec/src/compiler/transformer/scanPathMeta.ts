@@ -7,7 +7,9 @@ import {
   getMethodFromFileName,
 } from "./utils";
 
-import consola from "consola";
+function removeTrailingngSlash(route: string): string {
+  return route.replace(/\/$/, "");
+}
 
 export function replaceBrackets(route: string): string {
   return route.replace(/\[([a-zA-Z0-9_]+)\]/g, "{$1}");
@@ -38,9 +40,12 @@ export const scanPathMeta = (path: string): Meta => {
 
   const { routePart, method } = getMethodFromFileName(fileName);
   const fileRoute = join(dirname(noExt), routePart);
-  const urlRoute = replaceBrackets(fileRoute)
-    .replace("index", "/")
-    .replace(/\[\.{3}[^\]]+\]/g, "{path+}");
+
+  const urlRoute = removeTrailingngSlash(
+    replaceBrackets(fileRoute)
+      .replace("index", "")
+      .replace(/\[\.{3}[^\]]+\]/g, "{path+}"),
+  );
 
   const pathParameters = extractParams(fileRoute);
 

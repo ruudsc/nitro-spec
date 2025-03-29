@@ -9,11 +9,13 @@ import {
   createError,
   defineEventHandler,
   _RequestMiddleware,
+  EventHandlerObject,
 } from "h3";
 import consola from "consola";
 import { colors } from "consola/utils";
 import { registerRoute } from "../utils/registerRoute";
 import { isValidMethod, Method } from "../utils/isValidMethod";
+import { methodHasBody } from "../utils/methodHasBody";
 
 type Event = H3Event<Request>;
 
@@ -51,7 +53,7 @@ export function defineMeta<
   TResponseData = TResponse extends z.AnyZodObject ? z.infer<TResponse> : never,
 >(meta: RouteMeta<TPath, TQuery, TBody, TResponse>) {
   const {
-    body = z.object({}),
+    body,
     query = z.object({}),
     path = z.object({}),
     response = z.null(),
@@ -108,9 +110,10 @@ export function defineMeta<
       consola.error(meta.prefix, "Error validating params");
       consola.error(e);
     });
-    const hasBody = ["POST", "PUT", "PATCH"].includes(event.method);
+    const hasBody = body && methodHasBody(event.method);
 
     let _validatedBody = undefined;
+
     if (hasBody) {
       _validatedBody = await readValidatedBody(event, body.parse).catch((e) => {
         consola.error(meta.prefix, "Error validating body");
@@ -147,24 +150,50 @@ export function defineMeta<
       });
     }
   };
+  /* 
+  const wrappedHandler: Handler<TPathData, TQueryData, TBodyData, TResponseData> =  async (event: H3Event<EventHandlerRequest>) => {
+    const { query, body, path } = await requestValidator(event);
+
+    const response = await handler(event, path, query, body);
+
+    responseValidator(event, response);
+  }
+ */
+  const _defineEventHandler = (
+    args: Handler<TPathData, TQueryData, TBodyData, TResponseData>,
+  ) => {
+    const handlerFn = typeof args === "function" ? args : args.handler;
+
+    const beforeResponse =
+      typeof args === "object" && args.onBeforeResponse ?
+        Array.isArray(args.onBeforeResponse) ?
+          args.onBeforeResponse
+        : [args.onBeforeResponse]
+      : [];
+
+    beforeResponse.push(responseValidator);
+
+    const handler = defineEventHandler({
+      ...(typeof args === "object" ? args : undefined),
+      onBeforeResponse: beforeResponse,
+      handler: async (event) => {
+        const { query, body, path } = await requestValidator(event);
+        const response = await handlerFn(event, path, query, body);
+        return response;
+      },
+    });
+
+    return handler;
+  };
 
   return {
-    defineEventHandler: (
-      handler: Handler<TPathData, TQueryData, TBodyData, TResponseData>,
-    ) =>
-      defineEventHandler({
-        onBeforeResponse: responseValidator,
-        handler: async (event) => {
-          const { query, body, path } = await requestValidator(event);
-
-          return handler(event, path, query, body);
-        },
-      }),
+    defineEventHandler: _defineEventHandler,
   };
 }
 
 export type MaybePromise<T> = T | Promise<T>;
-export type Handler<TPath, TQuery, TBody, TResponse> = (
+
+export type HandlerFn<TPath, TQuery, TBody, TResponse> = (
   event: Event,
   params: TPath,
   query: TQuery,
@@ -172,5 +201,23 @@ export type Handler<TPath, TQuery, TBody, TResponse> = (
 ) => MaybePromise<
   Expand<TResponse extends z.AnyZodObject ? z.infer<TResponse> : TResponse>
 >;
+
+export type HandlerObject<TPath, TQuery, TBody, TResponse> = Omit<
+  EventHandlerObject,
+  "handler"
+> & {
+  handler: (
+    event: Event,
+    params: TPath,
+    query: TQuery,
+    body: TBody,
+  ) => MaybePromise<
+    Expand<TResponse extends z.AnyZodObject ? z.infer<TResponse> : TResponse>
+  >;
+};
+
+export type Handler<TPath, TQuery, TBody, TResponse> =
+  | HandlerFn<TPath, TQuery, TBody, TResponse>
+  | HandlerObject<TPath, TQuery, TBody, TResponse>;
 
 type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;

@@ -2,21 +2,16 @@ import { HTTPMethod } from "h3";
 import { registry } from "./registry";
 import { RouteMeta, ValidatorResponseTypes } from "../hooks/defineMeta";
 import { z } from "zod";
-import { ResponseConfig } from "@asteasolutions/zod-to-openapi";
+import { ResponseConfig, ZodRequestBody } from "@asteasolutions/zod-to-openapi";
 import { Method } from "./isValidMethod";
 import consola from "consola";
-
-/* import {
-  extendZodWithOpenApi,
-  ResponseConfig,
-} from "@asteasolutions/zod-to-openapi";
-
-extendZodWithOpenApi(z); */
+import { methodHasBody } from "./methodHasBody";
 
 export type RegisterRouteOptions = RouteMeta & {
   operationId: string;
   path: string;
   method: Method;
+  contentType?: string;
 };
 
 export const registerRoute = (options: RegisterRouteOptions) => {
@@ -25,22 +20,35 @@ export const registerRoute = (options: RegisterRouteOptions) => {
   };
 
   consola.debug(`registering ${options.method} ${options.path}`);
+  const hasBody = methodHasBody(options.method);
 
-  registry.registerPath({
-    method: options.method as any,
-    path: options.path,
-    tags: generateRouteTags(options.path),
-    responses: responses,
-    request: {
-      query: options.query,
-      params: pathParameters(options.path, options.operationId),
-      body: options.body && {
+  if (!hasBody && options.body) {
+    consola.warn(
+      `Route ${options.path} has a body but the method is not POST, PUT or PATCH. This is not recommended. The body will be ignored.`,
+    );
+  }
+
+  const requestBody =
+    options.body && hasBody ?
+      ({
         content: {
           "application/json": {
             schema: options.body,
           },
         },
-      },
+      } satisfies ZodRequestBody)
+    : undefined;
+
+  registry.registerPath({
+    method: options.method as any,
+    path: options.path,
+    operationId: options.operationId,
+    tags: generateRouteTags(options.path),
+    responses: responses,
+    request: {
+      query: options.query,
+      params: pathParameters(options.path, options.operationId),
+      body: requestBody,
     },
   });
 };
@@ -106,19 +114,3 @@ export const FormatOpenApiResponse = (
     content: {},
   };
 };
-
-/* 
-export const NotAuthorizedResponse = z
-  .object({
-    code: z.literal(401),
-    message: z.literal("Unauthorized"),
-  })
-  .openapi("Unauthorized");
-
-export const NotFoundResponse = z
-  .object({
-    message: z.literal("Not Found"),
-    code: z.literal(404),
-  })
-  .openapi("NotFound");
- */
