@@ -63,6 +63,7 @@ export function defineMeta<
   const { __path, __method } = meta as unknown as {
     __path: string;
     __method: Method;
+    __isCatchAll?: boolean;
   };
 
   if (isValidMethod(__method) === false) {

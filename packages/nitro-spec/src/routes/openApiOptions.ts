@@ -1,5 +1,6 @@
 export type BaseOpenApiOptions = {
   baseUrl: string;
+  openapi?: "3.1.0" | "3.0.0";
 };
 
 export type OpenApiOptions = BaseOpenApiOptions & {

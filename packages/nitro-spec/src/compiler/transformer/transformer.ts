@@ -75,5 +75,18 @@ const generateProperties = (meta: Meta) => {
       value: meta.method,
     },
   };
-  return [pathProperty, methodProperty];
+
+  const catchAllProperty: ObjectProperty = {
+    type: "ObjectProperty",
+    key: {
+      type: "Literal",
+      value: "__isCatchAll",
+    },
+    value: {
+      type: "Literal",
+      value: meta.isCatchAll,
+    },
+  };
+
+  return [pathProperty, methodProperty, catchAllProperty];
 };
