@@ -13,9 +13,10 @@ import {
 } from "h3";
 import consola from "consola";
 import { colors } from "consola/utils";
-import { registerRoute } from "../utils/registerRoute";
+import { registerRoute, RouteRequestBodyType } from "../utils/registerRoute";
 import { isValidMethod, Method } from "../utils/isValidMethod";
 import { methodHasBody } from "../utils/methodHasBody";
+import { ResponseConfig } from "@asteasolutions/zod-to-openapi";
 
 type Event = H3Event<Request>;
 
@@ -40,6 +41,8 @@ export type RouteMeta<
   query?: TQuery;
   body?: TBody;
   response: TResponse;
+  responses?: Record<number, ResponseConfig>;
+  bodyContentType?: RouteRequestBodyType;
 };
 
 export function defineMeta<
@@ -82,6 +85,7 @@ export function defineMeta<
     description: meta.description,
     summary: meta.summary,
     title: meta.title,
+    bodyContentType: meta.bodyContentType,
   });
 
   const getMeta = (event: Event) => {
