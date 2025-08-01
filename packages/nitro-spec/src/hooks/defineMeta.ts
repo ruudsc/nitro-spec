@@ -179,6 +179,8 @@ export function defineMeta<
       prefix: `[${colors.bold(method)}] ${path}`,
       transformResponse: meta.transformResponse,
       middleware: meta.middleware,
+      responses: meta.responses,
+      response: meta.response,
     };
   };
 
@@ -230,17 +232,14 @@ export function defineMeta<
     consola.log(meta.prefix, "Validating response");
 
     try {
-      // Get status code from event response status
       const statusCode = event.node.res.statusCode || 200;
       let responseSchema: ValidatorResponseTypes | null = null;
 
-      // Determine which schema to use based on response type
-      if (typeof response === 'object' && response !== null && !('_def' in response)) {
-        // Multiple response schemas by status code
-        responseSchema = (response as Record<number, ValidatorResponseTypes>)[statusCode] || null;
-      } else {
-        // Single response schema
-        responseSchema = response as ValidatorResponseTypes;
+      // Use meta.responses if defined and has a schema for this status code
+      if (meta.responses && typeof meta.responses === "object" && meta.responses[statusCode]) {
+        responseSchema = meta.responses[statusCode] || null;
+      } else if (meta.response) {
+        responseSchema = meta.response as ValidatorResponseTypes;
       }
 
       if (responseSchema == null && eventResponse?.body != null) {
@@ -248,11 +247,9 @@ export function defineMeta<
       } else if (responseSchema != null && 'parse' in responseSchema) {
         responseSchema.parse(eventResponse.body);
       } else {
-        // TODO: Add a warning that response is null and response is not validated
         consola.debug("Response is null and response is not validated");
       }
 
-      // Apply response transformation if defined
       if (meta.transformResponse && eventResponse?.body != null) {
         eventResponse.body = meta.transformResponse(eventResponse.body, event, statusCode);
       }
@@ -281,21 +278,18 @@ export function defineMeta<
     return async (event: Event) => {
       const { query, body, path } = await requestValidator(event);
       const response = await handlerFn(event, path, query, body);
-      
-      // Apply response validation and transformation
+
       const meta = getMeta(event);
       const statusCode = event.node.res.statusCode || 200;
-      
+
       try {
         let responseSchema: ValidatorResponseTypes | null = null;
 
-        // Determine which schema to use based on response type
-        if (typeof response === 'object' && response !== null && !('_def' in response)) {
-          // Multiple response schemas by status code
-          responseSchema = (response as Record<number, ValidatorResponseTypes>)[statusCode] || null;
-        } else {
-          // Single response schema
-          responseSchema = response as unknown as ValidatorResponseTypes;
+        // Use meta.responses if defined and has a schema for this status code
+        if (meta.responses && typeof meta.responses === "object" && meta.responses[statusCode]) {
+          responseSchema = meta.responses[statusCode] || null;
+        } else if (meta.response) {
+          responseSchema = meta.response as ValidatorResponseTypes;
         }
 
         if (responseSchema == null && response != null) {
@@ -304,7 +298,6 @@ export function defineMeta<
           responseSchema.parse(response);
         }
 
-        // Apply response transformation if defined
         let transformedResponse = response;
         if (meta.transformResponse && response != null) {
           transformedResponse = meta.transformResponse(response, event, statusCode);
