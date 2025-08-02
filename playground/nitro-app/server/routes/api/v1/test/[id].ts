@@ -1,10 +1,10 @@
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 import { testResponse } from "~/models/models";
 
 export const { defineEventHandler } = defineMeta({
   operationId: "getTest",
-  path: z.object({ id: z.string() }).openapi("TestPath"),
+  path: z.object({ id: z.string() }).meta({ id: "ApiV1TestIdtsTestIdPath" }),
   title: "Test title",
   response: testResponse,
 });
@@ -34,6 +34,6 @@ export default defineEventHandler(() => {
       {
         message: ["Hello", 1],
       },
-    ]
-  } ;
+    ],
+  };
 });

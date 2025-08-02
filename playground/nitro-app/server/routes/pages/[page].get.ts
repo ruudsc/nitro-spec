@@ -1,5 +1,5 @@
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 const { defineEventHandler } = defineMeta({
   path: z.object({
@@ -10,8 +10,13 @@ const { defineEventHandler } = defineMeta({
   }),
 });
 
-export default defineEventHandler((_event, _query, path) => {
-  return {
-    message: path.page,
+export default defineEventHandler((event, params) => {
+  const { page } = params;
+
+  // Simulate fetching page data
+  const pageData = {
+    message: `You are viewing page: ${page}`,
   };
+
+  return pageData;
 });

@@ -4,7 +4,7 @@ import {
   createResponseFormatTransformer,
   composeTransformers,
 } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Schema definitions
 const ProductSchema = z
@@ -31,7 +31,7 @@ const ProductSchema = z
       })
       .optional(),
   })
-  .openapi("Product");
+  .meta({ id: "PagesProductsgettsProduct" });
 
 const ProductsQuerySchema = z
   .object({
@@ -41,7 +41,7 @@ const ProductsQuerySchema = z
     maxPrice: z.coerce.number().optional(),
     fields: z.string().optional(), // For field filtering: ?fields=id,name,price
   })
-  .openapi("ProductsQuery");
+  .meta({ id: "PagesProductsgettsProductsQuery" });
 
 // Advanced response transformer combining multiple transformations
 const productTransformer = composeTransformers(
@@ -70,7 +70,9 @@ const { defineEventHandler } = defineMeta({
     "Retrieve a list of products with optional filtering and field selection",
   summary: "List products with advanced filtering",
   query: ProductsQuerySchema,
-  response: z.array(ProductSchema).openapi("ProductsList"),
+  response: z
+    .array(ProductSchema)
+    .meta({ id: "PagesProductsgettsProductsList" }),
   middleware: [performanceMiddleware],
   transformResponse: productTransformer,
 });

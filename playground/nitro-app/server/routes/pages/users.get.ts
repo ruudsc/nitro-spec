@@ -4,7 +4,7 @@ import {
   createResponseFormatTransformer,
   composeTransformers,
 } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Schema definitions
 const UserSchema = z
@@ -16,7 +16,7 @@ const UserSchema = z
     role: z.enum(["user", "admin", "moderator"]),
     createdAt: z.string().datetime(),
   })
-  .openapi("User");
+  .meta({ id: "PagesUsersgettsUser" });
 
 const UsersQuerySchema = z
   .object({
@@ -25,7 +25,7 @@ const UsersQuerySchema = z
     role: z.enum(["user", "admin", "moderator"]).optional(),
     search: z.string().optional(),
   })
-  .openapi("UsersQuery");
+  .meta({ id: "PagesUsersgettsUsersQuery" });
 
 const UsersResponseSchema = z
   .object({
@@ -34,7 +34,7 @@ const UsersResponseSchema = z
     page: z.number(),
     limit: z.number(),
   })
-  .openapi("UsersResponse");
+  .meta({ id: "PagesUsersgettsUsersResponse" });
 
 // Custom middleware example
 const loggingMiddleware = {

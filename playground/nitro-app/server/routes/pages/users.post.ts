@@ -1,6 +1,6 @@
 import { defineMeta } from "nitro-spec";
 import { createResponseFormatTransformer } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Schema definitions
 const CreateUserSchema = z
@@ -13,7 +13,7 @@ const CreateUserSchema = z
       .max(100, "Must be under 100 years old"),
     role: z.enum(["user", "admin", "moderator"]).default("user"),
   })
-  .openapi("CreateUser");
+  .meta({ id: "PagesUsersposttsCreateUser" });
 
 const UserSchema = z
   .object({
@@ -24,7 +24,7 @@ const UserSchema = z
     role: z.enum(["user", "admin", "moderator"]),
     createdAt: z.string().datetime(),
   })
-  .openapi("User");
+  .meta({ id: "PagesUsersposttsUser" });
 
 // Multiple response schemas for different status codes
 const responseSchemas = {
@@ -36,14 +36,14 @@ const responseSchemas = {
       message: z.string(),
       errors: z.array(z.string()).optional(),
     })
-    .openapi("ValidationError"),
+    .meta({ id: "PagesUsersposttsValidationError" }),
   409: z
     .object({
       statusCode: z.literal(409),
       statusMessage: z.literal("Conflict"),
       message: z.string(),
     })
-    .openapi("ConflictError"),
+    .meta({ id: "PagesUsersposttsConflictError" }),
 };
 
 // Validation middleware

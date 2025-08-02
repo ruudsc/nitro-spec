@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "nitro-spec";
 import { defineMeta } from "nitro-spec";
 
 const { defineEventHandler } = defineMeta({
@@ -6,7 +6,7 @@ const { defineEventHandler } = defineMeta({
     .object({
       message: z.string(),
     })
-    .openapi("MyResponse"),
+    .meta({ id: "IndexgettsMyResponse" }),
 });
 
 export default defineEventHandler((_event, _query, _body) => {

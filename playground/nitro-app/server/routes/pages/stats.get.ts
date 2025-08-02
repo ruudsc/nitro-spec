@@ -1,5 +1,5 @@
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Schema definitions
 const StatsSchema = z
@@ -14,7 +14,7 @@ const StatsSchema = z
     }),
     generatedAt: z.string().datetime(),
   })
-  .openapi("UserStats");
+  .meta({ id: "PagesStatsgettsUserStats" });
 
 // Cache warming middleware
 const cacheMiddleware = {

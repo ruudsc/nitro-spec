@@ -1,12 +1,12 @@
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Schema definitions
 const UserParamsSchema = z
   .object({
     id: z.string().min(1, "User ID is required"),
   })
-  .openapi("UserParams");
+  .meta({ id: "PagesUsersIdpatchtsUserParams" });
 
 const UpdateUserSchema = z
   .object({
@@ -15,7 +15,7 @@ const UpdateUserSchema = z
     age: z.number().min(18).max(100).optional(),
     role: z.enum(["user", "admin", "moderator"]).optional(),
   })
-  .openapi("UpdateUser");
+  .meta({ id: "PagesUsersIdpatchtsUpdateUser" });
 
 const UserSchema = z
   .object({
@@ -27,7 +27,7 @@ const UserSchema = z
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
   })
-  .openapi("User");
+  .meta({ id: "PagesUsersIdpatchtsUser" });
 
 // Audit logging middleware
 const auditMiddleware = {
