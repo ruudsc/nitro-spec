@@ -27,7 +27,7 @@ export type ValidatorResponseTypes =
 export type RouteMeta<
   TPath extends z.AnyZodObject = z.AnyZodObject,
   TQuery extends z.AnyZodObject = z.AnyZodObject,
-  TBody extends z.ZodAny = z.ZodAny,
+  TBody extends z.ZodAny | z.AnyZodObject = z.ZodAny,
   TResponse extends ValidatorResponseTypes = z.ZodNull,
 > = {
   operationId?: string;
@@ -43,7 +43,7 @@ export type RouteMeta<
 export function defineMeta<
   TPath extends z.AnyZodObject = z.AnyZodObject,
   TQuery extends z.AnyZodObject = z.AnyZodObject,
-  TBody extends z.ZodAny = z.ZodAny,
+  TBody extends z.ZodAny | z.AnyZodObject = z.ZodAny,
   TResponse extends ValidatorResponseTypes = z.ZodNull,
   TPathData = z.infer<TPath>,
   TQueryData = z.infer<TQuery>,

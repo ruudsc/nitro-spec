@@ -8,7 +8,9 @@ export default <Options>{
 
   sourcemap: true,
   minify: false,
-  splitting: true,
+  splitting: false,
+  bundle: false,
+
   external: [
     "recast",
     "fs",

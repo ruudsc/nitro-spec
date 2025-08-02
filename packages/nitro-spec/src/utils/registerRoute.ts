@@ -4,6 +4,7 @@ import { RouteMeta, ValidatorResponseTypes } from "../hooks/defineMeta";
 import { z } from "zod";
 import { ResponseConfig } from "@asteasolutions/zod-to-openapi";
 import { Method } from "./isValidMethod";
+import consola from "consola";
 
 /* import {
   extendZodWithOpenApi,
@@ -23,7 +24,7 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     [200]: FormatOpenApiResponse("OK", options.response),
   };
 
-  console.log(`registering ${options.method} ${options.path}`);
+  consola.debug(`registering ${options.method} ${options.path}`);
 
   registry.registerPath({
     method: options.method as any,
@@ -45,6 +46,8 @@ export const registerRoute = (options: RegisterRouteOptions) => {
 };
 
 const generateRouteTags = (path: string) => {
+  if (path === "" || path === "/") return ["root"];
+
   const tags = path
     .split("/")
     .filter((part) => {
