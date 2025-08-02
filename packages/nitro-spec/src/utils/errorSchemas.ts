@@ -1,61 +1,75 @@
 import { z } from "zod";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 
-// Ensure Zod is extended with OpenAPI functionality
+// Ensure Zod is extended with OpenAPI functionality for v8 compatibility
 extendZodWithOpenApi(z);
 
 // Common error response schemas
-export const ValidationErrorSchema = z.object({
-  statusCode: z.literal(400),
-  statusMessage: z.literal("Validation Error"),
-  message: z.string(),
-  data: z.any().optional(),
-}).openapi("ValidationError");
+export const ValidationErrorSchema = z
+  .object({
+    statusCode: z.literal(400),
+    statusMessage: z.literal("Validation Error"),
+    message: z.string(),
+    data: z.any().optional(),
+  })
+  .meta({ id: "ValidationError" });
 
-export const UnauthorizedErrorSchema = z.object({
-  statusCode: z.literal(401),
-  statusMessage: z.literal("Unauthorized"),
-  message: z.string(),
-}).openapi("UnauthorizedError");
+export const UnauthorizedErrorSchema = z
+  .object({
+    statusCode: z.literal(401),
+    statusMessage: z.literal("Unauthorized"),
+    message: z.string(),
+  })
+  .meta({ id: "UnauthorizedError" });
 
-export const ForbiddenErrorSchema = z.object({
-  statusCode: z.literal(403),
-  statusMessage: z.literal("Forbidden"),
-  message: z.string(),
-}).openapi("ForbiddenError");
+export const ForbiddenErrorSchema = z
+  .object({
+    statusCode: z.literal(403),
+    statusMessage: z.literal("Forbidden"),
+    message: z.string(),
+  })
+  .meta({ id: "ForbiddenError" });
 
-export const NotFoundErrorSchema = z.object({
-  statusCode: z.literal(404),
-  statusMessage: z.literal("Not Found"),
-  message: z.string(),
-}).openapi("NotFoundError");
+export const NotFoundErrorSchema = z
+  .object({
+    statusCode: z.literal(404),
+    statusMessage: z.literal("Not Found"),
+    message: z.string(),
+  })
+  .meta({ id: "NotFoundError" });
 
-export const UnprocessableEntityErrorSchema = z.object({
-  statusCode: z.literal(422),
-  statusMessage: z.literal("Unprocessable Entity"),
-  message: z.string(),
-  data: z.any().optional(),
-}).openapi("UnprocessableEntityError");
+export const UnprocessableEntityErrorSchema = z
+  .object({
+    statusCode: z.literal(422),
+    statusMessage: z.literal("Unprocessable Entity"),
+    message: z.string(),
+    data: z.any().optional(),
+  })
+  .meta({ id: "UnprocessableEntityError" });
 
-export const InternalServerErrorSchema = z.object({
-  statusCode: z.literal(500),
-  statusMessage: z.literal("Internal Server Error"),
-  message: z.string(),
-}).openapi("InternalServerError");
+export const InternalServerErrorSchema = z
+  .object({
+    statusCode: z.literal(500),
+    statusMessage: z.literal("Internal Server Error"),
+    message: z.string(),
+  })
+  .meta({ id: "InternalServerError" });
 
-export const TooManyRequestsErrorSchema = z.object({
-  statusCode: z.literal(429),
-  statusMessage: z.literal("Too Many Requests"),
-  message: z.string(),
-  retryAfter: z.number().optional(),
-}).openapi("TooManyRequestsError");
+export const TooManyRequestsErrorSchema = z
+  .object({
+    statusCode: z.literal(429),
+    statusMessage: z.literal("Too Many Requests"),
+    message: z.string(),
+    retryAfter: z.number().optional(),
+  })
+  .meta({ id: "TooManyRequestsError" });
 
 // Helper function to create common error responses
 export const createErrorResponses = (
-  includeErrors: (400 | 401 | 403 | 404 | 422 | 429 | 500)[] = [400, 500]
+  includeErrors: (400 | 401 | 403 | 404 | 422 | 429 | 500)[] = [400, 500],
 ) => {
   const responses: Record<number, any> = {};
-  
+
   if (includeErrors.includes(400)) {
     responses[400] = ValidationErrorSchema;
   }
@@ -77,6 +91,6 @@ export const createErrorResponses = (
   if (includeErrors.includes(500)) {
     responses[500] = InternalServerErrorSchema;
   }
-  
+
   return responses;
 };

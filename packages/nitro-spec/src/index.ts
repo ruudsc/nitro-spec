@@ -1,6 +1,5 @@
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
-extendZodWithOpenApi(z);
 
 export { defineMeta } from "./hooks/defineMeta";
 export { defineMetaRaw } from "./hooks/defineMetaRaw";
@@ -29,3 +28,5 @@ export type {
 } from "./hooks/defineMeta";
 
 extendZodWithOpenApi(z);
+
+export { z };

@@ -37,11 +37,9 @@ export const createOpenApiJsonEndpoint = (
           license,
           termsOfService,
         },
+
         servers,
       });
-
-      // Not supported.
-      delete document.webhooks;
 
       return document;
     } catch (e) {
