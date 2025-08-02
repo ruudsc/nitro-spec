@@ -3,6 +3,11 @@
   "type": "module",
   "version": "0.0.1",
   "license": "MIT",
+  "nx": {
+    "tags": [
+      "library"
+    ]
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -62,12 +67,12 @@
     "acorn": "^8.14.1",
     "consola": "^3.4.0",
     "esbuild": "*",
-    "h3": "1.15.1",
-    "nitropack": "^2.11.5",
+    "h3": "1.15.4",
+    "nitropack": "^2.12.4",
     "pathe": "^2.0.3",
-    "pkg-types": "^2.1.0",
-    "rollup": "^3",
-    "unimport": "^4.1.2",
+    "pkg-types": "^2.2.0",
+    "rollup": "^3.29.5",
+    "unimport": "^4.2.0",
     "vite": ">=3",
     "webpack": "^4 || ^5",
     "zod": "catalog:"
@@ -93,28 +98,28 @@
     }
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.0",
+    "@asteasolutions/zod-to-openapi": "catalog:",
     "escodegen": "^2.1.0",
     "unplugin": "^2.1.2",
     "yaml": "2.7.0"
   },
   "devDependencies": {
-    "@nuxt/kit": "^3.15.4",
-    "@nuxt/schema": "^3.15.4",
+    "@nuxt/kit": "^4.0.2",
+    "@nuxt/schema": "^4.0.2",
     "@types/escodegen": "^0.0.10",
     "@types/node": "^22.13.1",
     "acorn-walk": "^8.3.4",
-    "bumpp": "^10.0.2",
-    "eslint": "^9.20.0",
-    "nodemon": "^3.1.9",
-    "openapi3-ts": "^4.4.0",
-    "prettier": "^3.5.3",
-    "rollup": "^4.34.6",
-    "tsup": "^8.3.6",
-    "tsx": "^4.19.2",
+    "bumpp": "^10.2.2",
+    "eslint": "^9.32.0",
+    "nodemon": "^3.1.10",
+    "openapi3-ts": "^4.5.0",
+    "prettier": "^3.6.2",
+    "rollup": "^4.46.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
     "typescript": "catalog:",
-    "vite": "^6.1.0",
-    "vitest": "^3.0.5",
-    "webpack": "^5.97.1"
+    "vite": "^7.0.6",
+    "vitest": "^3.2.4",
+    "webpack": "^5.101.0"
   }
 }

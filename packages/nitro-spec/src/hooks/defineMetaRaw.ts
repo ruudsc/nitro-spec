@@ -5,8 +5,21 @@ import { registry } from "../utils/registry";
 import { RouteConfig } from "@asteasolutions/zod-to-openapi";
 
 /**
+ * Registers a route in the OpenAPI registry for build-time metadata extraction.
  *
- * Register a route in the registry.
+ * This low-level utility is used by the nitro-spec plugin to record route definitions
+ * during build/transform time, enabling automatic OpenAPI spec generation.
+ * 
+ * This is also used as an escape hatch for when you need to define something unsupported.
+ *
+ * @param meta Route configuration object (excluding path and method, which are injected)
+ *
+ * @example
+ * defineMetaRaw({
+ *   operationId: "getUser",
+ *   response: UserSchema,
+ *   // ...other OpenAPI metadata
+ * });
  */
 export function defineMetaRaw(meta: Omit<RouteConfig, "path" | "method">) {
   /** values injected by the rollup plugin */

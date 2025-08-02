@@ -1,8 +1,6 @@
-import { z } from "zod";
-extendZodWithOpenApi(z);
-
+import { z } from "nitro-spec";
 import { createNitroSpecPlugin } from "nitro-spec";
-import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+
 export default defineNitroPlugin((app) => {
   createNitroSpecPlugin({
     app,

@@ -4,7 +4,9 @@
   "scripts": {
     "clean": " nx run-many --targets=clean && rm -rf node_modules",
     "build": "nx run-many --targets=build --output-style=stream",
+    "build:lib": "nx run-many --targets=build --projects=tag:library --output-style=stream",
     "dev": "nx run-many --targets=dev --output-style=stream",
+    "playground": "nx run @nitro-app/test-project:dev",
     "lint": "nx run-many --targets=lint --output-style=stream",
     "orval": "nx run-many --targets=orval --output-style=stream",
     "format": "nx run-many --targets=format --output-style=stream",

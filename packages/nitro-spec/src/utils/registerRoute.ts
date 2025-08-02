@@ -16,10 +16,60 @@ export type RegisterRouteOptions = RouteMeta & {
   __isCatchAll?: boolean;
 };
 
-export const registerRoute = (options: RegisterRouteOptions) => {
-  const responses: Record<number, ResponseConfig> = {
-    [200]: FormatOpenApiResponse("OK", options.response),
+// Status code descriptions
+const getStatusDescription = (code: number): string => {
+  const descriptions: Record<number, string> = {
+    200: "OK",
+    201: "Created",
+    202: "Accepted",
+    204: "No Content",
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    404: "Not Found",
+    422: "Unprocessable Entity",
+    500: "Internal Server Error",
+    502: "Bad Gateway",
+    503: "Service Unavailable",
   };
+  return descriptions[code] || `Status ${code}`;
+};
+
+export const registerRoute = (options: RegisterRouteOptions) => {
+  let responses: Record<number, ResponseConfig> = {};
+
+  // Handle multiple response types
+  if (
+    typeof options.response === "object" &&
+    options.response !== null &&
+    !("_def" in options.response)
+  ) {
+    // Multiple response schemas by status code
+    const responsesByStatus = options.response as Record<
+      number,
+      ValidatorResponseTypes
+    >;
+    for (const [statusCode, schema] of Object.entries(responsesByStatus)) {
+      const code = parseInt(statusCode);
+      const description = getStatusDescription(code);
+      responses[code] = FormatOpenApiResponse(description, schema);
+    }
+  } else {
+    // Single response schema (default to 200)
+    responses[200] = FormatOpenApiResponse(
+      "OK",
+      options.response as ValidatorResponseTypes,
+    );
+  }
+
+  // Add additional responses if specified
+  if (options.responses) {
+    for (const [statusCode, schema] of Object.entries(options.responses)) {
+      const code = parseInt(statusCode as string);
+      const description = getStatusDescription(code);
+      responses[code] = FormatOpenApiResponse(description, schema);
+    }
+  }
 
   consola.debug(`registering ${options.method} ${options.path}`);
   const hasBody = methodHasBody(options.method);
@@ -46,7 +96,6 @@ export const registerRoute = (options: RegisterRouteOptions) => {
   registry.registerPath({
     description: options.description,
     summary: options.summary,
-
     method: options.method as any,
     path: options.path,
     operationId: options.operationId,

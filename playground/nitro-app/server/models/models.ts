@@ -1,13 +1,14 @@
-import { z } from "zod";
+import { z } from "nitro-spec";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 
+// Ensure Zod is extended for backward compatibility
 extendZodWithOpenApi(z);
 
 export const testReference = z
   .object({
     message: z.tuple([z.string(), z.number()]),
   })
-  .openapi("TestReference");
+  .meta({ id: "TestReference" });
 
 export const testResponse = z
   .object({
@@ -18,4 +19,4 @@ export const testResponse = z
     }),
     test: testReference.array(),
   })
-  .openapi("MyResponse");
+  .meta({ id: "MyResponse" });
