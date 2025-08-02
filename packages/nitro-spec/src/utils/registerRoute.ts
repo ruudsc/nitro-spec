@@ -1,4 +1,3 @@
-import { HTTPMethod } from "h3";
 import { registry } from "./registry";
 import { RouteMeta, ValidatorResponseTypes } from "../hooks/defineMeta";
 import { z } from "zod";
@@ -7,11 +6,13 @@ import { Method } from "./isValidMethod";
 import consola from "consola";
 import { methodHasBody } from "./methodHasBody";
 
+export type RouteRequestBodyType = "application/json" | "multipart/form-data";
 export type RegisterRouteOptions = RouteMeta & {
   operationId: string;
   path: string;
   method: Method;
   contentType?: string;
+  bodyContent?: RouteRequestBodyType;
   __isCatchAll?: boolean;
 };
 
@@ -29,11 +30,13 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     );
   }
 
+  const bodyContentType = options.bodyContent ?? "application/json";
+
   const requestBody =
     options.body && hasBody ?
       ({
         content: {
-          "application/json": {
+          [bodyContentType]: {
             schema: options.body,
           },
         },
@@ -41,6 +44,9 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     : undefined;
 
   registry.registerPath({
+    description: options.description,
+    summary: options.summary,
+
     method: options.method as any,
     path: options.path,
     operationId: options.operationId,
