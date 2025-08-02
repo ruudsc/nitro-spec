@@ -1,0 +1,18 @@
+{
+  "name": "@nitro-app/test-project",
+  "private": true,
+  "scripts": {
+    "build": "nitro build",
+    "clean": "rm -rf .nuxt .output node_modules",
+    "dev": "nitro dev",
+    "prepare": "nitro prepare",
+    "preview": "node .output/server/index.mjs"
+  },
+  "devDependencies": {
+    "nitropack": "catalog:",
+    "rollup": "4.34.9",
+    "nitro-spec": "workspace:*",
+    "zod": "catalog:",
+    "zod-openapi": "catalog:"
+  }
+}

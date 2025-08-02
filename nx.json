@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "installation": {
+    "version": "20.4.6"
+  },
+  "parallel": 10,
+  "plugins": []
+}
