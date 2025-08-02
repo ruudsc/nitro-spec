@@ -2,7 +2,7 @@ import { ResponseConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
 export const toZodResponse = (
-  schema: z.AnyZodObject,
+  schema: z.ZodObject<z.ZodRawShape>,
   description: string = "",
 ): ResponseConfig => {
   return {
