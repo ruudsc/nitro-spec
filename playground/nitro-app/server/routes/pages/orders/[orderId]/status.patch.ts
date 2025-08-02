@@ -1,12 +1,12 @@
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Simple order status update example
 const OrderParamsSchema = z
   .object({
     orderId: z.string(),
   })
-  .openapi("OrderParams");
+  .meta({ id: "PagesOrdersOrderIdStatuspatchtsOrderParams" });
 
 const OrderStatusUpdateSchema = z
   .object({
@@ -19,7 +19,7 @@ const OrderStatusUpdateSchema = z
     ]),
     notes: z.string().optional(),
   })
-  .openapi("OrderStatusUpdate");
+  .meta({ id: "PagesOrdersOrderIdStatuspatchtsOrderStatusUpdate" });
 
 const OrderSchema = z
   .object({
@@ -34,7 +34,7 @@ const OrderSchema = z
     updatedAt: z.string().datetime(),
     notes: z.string().optional(),
   })
-  .openapi("Order");
+  .meta({ id: "PagesOrdersOrderIdStatuspatchtsOrder" });
 
 const { defineEventHandler } = defineMeta({
   operationId: "updateOrderStatus",

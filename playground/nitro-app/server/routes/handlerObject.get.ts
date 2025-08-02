@@ -1,6 +1,6 @@
 import { EventHandler, H3Event } from "h3";
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 const { defineEventHandler } = defineMeta({
   operationId: "get-handler-object",

@@ -1,12 +1,12 @@
 import { defineMeta } from "nitro-spec";
-import { z } from "zod";
+import { z } from "nitro-spec";
 
 // Schema definitions
 const UserParamsSchema = z
   .object({
     id: z.string().min(1, "User ID is required"),
   })
-  .openapi("UserParams");
+  .meta({ id: "PagesUsersIdgettsUserParams" });
 
 const UserSchema = z
   .object({
@@ -18,7 +18,7 @@ const UserSchema = z
     createdAt: z.string().datetime(),
     lastLogin: z.string().datetime().optional(),
   })
-  .openapi("User");
+  .meta({ id: "PagesUsersIdgettsUser" });
 
 const NotFoundErrorSchema = z
   .object({
@@ -26,7 +26,7 @@ const NotFoundErrorSchema = z
     statusMessage: z.literal("Not Found"),
     message: z.string(),
   })
-  .openapi("NotFoundError");
+  .meta({ id: "PagesUsersIdgettsNotFoundError" });
 
 // Multiple response schemas
 const responseSchemas = {
