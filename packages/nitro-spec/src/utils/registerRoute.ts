@@ -1,5 +1,5 @@
 import { registry } from "./registry";
-import { RouteMeta, ValidatorResponseTypes, StatusCodeResponses } from "../hooks/defineMeta";
+import { RouteMeta, ValidatorResponseTypes } from "../hooks/defineMeta";
 import { z } from "zod";
 import { ResponseConfig, ZodRequestBody } from "@asteasolutions/zod-to-openapi";
 import { Method } from "./isValidMethod";
@@ -39,9 +39,16 @@ export const registerRoute = (options: RegisterRouteOptions) => {
   let responses: Record<number, ResponseConfig> = {};
 
   // Handle multiple response types
-  if (typeof options.response === 'object' && options.response !== null && !('_def' in options.response)) {
+  if (
+    typeof options.response === "object" &&
+    options.response !== null &&
+    !("_def" in options.response)
+  ) {
     // Multiple response schemas by status code
-    const responsesByStatus = options.response as Record<number, ValidatorResponseTypes>;
+    const responsesByStatus = options.response as Record<
+      number,
+      ValidatorResponseTypes
+    >;
     for (const [statusCode, schema] of Object.entries(responsesByStatus)) {
       const code = parseInt(statusCode);
       const description = getStatusDescription(code);
@@ -49,7 +56,10 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     }
   } else {
     // Single response schema (default to 200)
-    responses[200] = FormatOpenApiResponse("OK", options.response as ValidatorResponseTypes);
+    responses[200] = FormatOpenApiResponse(
+      "OK",
+      options.response as ValidatorResponseTypes,
+    );
   }
 
   // Add additional responses if specified
@@ -86,7 +96,6 @@ export const registerRoute = (options: RegisterRouteOptions) => {
   registry.registerPath({
     description: options.description,
     summary: options.summary,
-
     method: options.method as any,
     path: options.path,
     operationId: options.operationId,
