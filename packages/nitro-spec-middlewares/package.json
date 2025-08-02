@@ -1,0 +1,97 @@
+{
+  "name": "@nitro-spec/middlewares",
+  "type": "module",
+  "version": "0.0.1",
+  "license": "MIT",
+  "nx": {
+    "tags": [
+      "library"
+    ]
+  },
+  "description": "Pre-built middleware collection for nitro-spec applications",
+  "keywords": [
+    "nitro",
+    "h3",
+    "middleware",
+    "authentication",
+    "validation",
+    "cors",
+    "rate-limiting"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.js"
+    },
+    "./security": {
+      "types": "./dist/security/index.d.ts",
+      "import": "./dist/security/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf .nuxt .output node_modules",
+    "dev": "tsup --watch src",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build",
+    "release": "bumpp && pnpm publish",
+    "test": "vitest",
+    "test:watch": "vitest --watch"
+  },
+  "peerDependencies": {
+    "h3": "catalog:",
+    "zod": "catalog:",
+    "nitro-spec": "workspace:*"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^22.13.1",
+    "bumpp": "^10.2.2",
+    "eslint": "^9.32.0",
+    "prettier": "^3.6.2",
+    "tsup": "catalog:",
+    "tsx": "^4.20.3",
+    "typescript": "catalog:",
+    "vitest": "^3.2.4"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruudsc/nitro-spec.git",
+    "directory": "packages/nitro-spec-middlewares"
+  },
+  "bugs": {
+    "url": "https://github.com/ruudsc/nitro-spec/issues"
+  },
+  "homepage": "https://github.com/ruudsc/nitro-spec#readme"
+}
