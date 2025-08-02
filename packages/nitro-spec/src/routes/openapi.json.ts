@@ -1,4 +1,4 @@
-import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
+import { OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
 import consola from "consola";
 import { createError, defineEventHandler, EventHandler } from "h3";
 import { registry } from "../utils/registry";
@@ -9,7 +9,7 @@ export const createOpenApiJsonEndpoint = (
 ): EventHandler<Request, unknown> =>
   defineEventHandler(async () => {
     try {
-      const generator = new OpenApiGeneratorV3(registry.definitions);
+      const generator = new OpenApiGeneratorV31(registry.definitions);
       const {
         title = "Nitro Server Routes",
         description,

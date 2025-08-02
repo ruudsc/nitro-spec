@@ -62,8 +62,8 @@ export const getTypescriptAliases = async (path?: string) => {
   const directory = file.split("/").slice(0, -1).join("/");
   const config = await readTSConfig(file);
 
-  console.log("file", file);
-  console.log("tsconfig dir", directory);
+  // console.log("file", file);
+  // console.log("tsconfig dir", directory);
 
   if (config.extends) {
     const extendsArr =

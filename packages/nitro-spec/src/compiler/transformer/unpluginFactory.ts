@@ -2,9 +2,9 @@ import type { UnpluginFactory } from "unplugin";
 
 import { createUnplugin } from "unplugin";
 import { scanPathMeta } from "./scanPathMeta";
-import { catchAllRouteRegex } from "./utils";
 import { Options } from "../factories/types";
 import { transformer } from "./transformer";
+
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (
   options,
 ) => {
