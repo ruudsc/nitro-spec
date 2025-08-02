@@ -1,10 +1,11 @@
-import { defineEventHandler, setResponseHeader } from "h3";
+import { defineEventHandler, EventHandler, setResponseHeader } from "h3";
 import yaml from "yaml";
 
-export const openapiYamlRoute = defineEventHandler(async (event) => {
-  const document = await $fetch("/openapi.json");
+export const createOpenapiYamlRoute = (): EventHandler<Request, unknown> =>
+  defineEventHandler(async (event) => {
+    const document = await $fetch("/openapi.json");
 
-  setResponseHeader(event, "Content-Type", "application/yaml");
+    setResponseHeader(event, "Content-Type", "application/yaml");
 
-  return yaml.stringify(document, { indent: 2 });
-});
+    return yaml.stringify(document, { indent: 2 });
+  });

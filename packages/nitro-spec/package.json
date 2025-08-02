@@ -11,22 +11,27 @@
     },
     "./vite": {
       "types": "./dist/compiler/factories/vite.d.ts",
+      "require": "./dist/compiler/factories/vite.cjs",
       "import": "./dist/compiler/factories/vite.js"
     },
     "./webpack": {
       "types": "./dist/compiler/factories/webpack.d.ts",
+      "require": "./dist/compiler/factories/webpack.cjs",
       "import": "./dist/compiler/factories/webpack.js"
     },
     "./rollup": {
       "types": "./dist/compiler/factories/rollup.d.ts",
+      "require": "./dist/compiler/factories/rollup.cjs",
       "import": "./dist/compiler/factories/rollup.js"
     },
     "./esbuild": {
       "types": "./dist/compiler/factories/esbuild.d.ts",
+      "require": "./dist/compiler/factories/esbuild.cjs",
       "import": "./dist/compiler/factories/esbuild.js"
     },
     "./nuxt": {
       "types": "./dist/compiler/factories/nuxt.d.ts",
+      "require": "./dist/compiler/factories/nuxt.cjs",
       "import": "./dist/compiler/factories/nuxt.js"
     },
     "./types": {
@@ -52,21 +57,22 @@
     "start": "tsx src/index.ts"
   },
   "peerDependencies": {
-    "h3": "1.15.1",
-    "nitropack": "^2.11.5",
-    "acorn": "^8.14.1",
-    "consola": "^3.4.0",
-    "jiti": "^2.4.2",
-    "pathe": "^2.0.3",
-    "pkg-types": "^2.1.0",
-    "unimport": "^4.1.2",
-    "zod": "catalog:",
+    "recast": "0.23.11",
     "@nuxt/kit": "^3",
     "@nuxt/schema": "^3",
+    "acorn": "^8.14.1",
+    "consola": "^3.4.0",
     "esbuild": "*",
+    "h3": "1.15.1",
+    "jiti": "^2.4.2",
+    "nitropack": "^2.11.5",
+    "pathe": "^2.0.3",
+    "pkg-types": "^2.1.0",
     "rollup": "^3",
+    "unimport": "^4.1.2",
     "vite": ">=3",
-    "webpack": "^4 || ^5"
+    "webpack": "^4 || ^5",
+    "zod": "catalog:"
   },
   "peerDependenciesMeta": {
     "@nuxt/kit": {
@@ -89,17 +95,22 @@
     }
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.0",
+    "escodegen": "^2.1.0",
     "unplugin": "^2.1.2",
     "yaml": "2.7.0"
   },
   "devDependencies": {
-    "prettier": "^3.5.3",
     "@nuxt/kit": "^3.15.4",
     "@nuxt/schema": "^3.15.4",
+    "@types/escodegen": "^0.0.10",
     "@types/node": "^22.13.1",
+    "acorn-walk": "^8.3.4",
     "bumpp": "^10.0.2",
     "eslint": "^9.20.0",
     "nodemon": "^3.1.9",
+    "openapi3-ts": "^4.4.0",
+    "prettier": "^3.5.3",
     "rollup": "^4.34.6",
     "tsup": "^8.3.6",
     "tsx": "^4.19.2",
