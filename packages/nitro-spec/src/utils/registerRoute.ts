@@ -109,19 +109,12 @@ export const FormatOpenApiResponse = (
   schema: ValidatorResponseTypes,
   mimeType: string = "json",
 ): ResponseConfig => {
-  if (schema instanceof z.ZodObject) {
-    return {
-      description,
-      content: {
-        [`application/${mimeType}`]: {
-          schema,
-        },
-      },
-    };
-  }
-
   return {
     description,
-    content: {},
+    content: {
+      [`application/${mimeType}`]: {
+        schema: schema as any,
+      },
+    },
   };
 };
