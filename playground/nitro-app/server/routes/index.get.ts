@@ -1,12 +1,15 @@
-import { z, defineMeta } from "nitro-spec";
+import { z } from "zod";
+import { defineMeta } from "nitro-spec";
 
 const { defineEventHandler } = defineMeta({
-  response: z.object({
-    message: z.string(),
-  }),
+  response: z
+    .object({
+      message: z.string(),
+    })
+    .openapi("MyResponse"),
 });
 
-export default defineEventHandler((event, query, body) => {
+export default defineEventHandler((_event, _query, _body) => {
   return {
     message: "Hello World",
   };
