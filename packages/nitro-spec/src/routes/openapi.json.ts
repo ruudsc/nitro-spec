@@ -1,4 +1,7 @@
-import { OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
+import {
+  OpenApiGeneratorV3,
+  OpenApiGeneratorV31,
+} from "@asteasolutions/zod-to-openapi";
 import consola from "consola";
 import { createError, defineEventHandler, EventHandler } from "h3";
 import { registry } from "../utils/registry";
@@ -9,7 +12,11 @@ export const createOpenApiJsonEndpoint = (
 ): EventHandler<Request, unknown> =>
   defineEventHandler(async () => {
     try {
-      const generator = new OpenApiGeneratorV31(registry.definitions);
+      const generator =
+        options.openapi ?
+          new OpenApiGeneratorV31(registry.definitions)
+        : new OpenApiGeneratorV3(registry.definitions);
+
       const {
         title = "Nitro Server Routes",
         description,
@@ -17,13 +24,14 @@ export const createOpenApiJsonEndpoint = (
         license,
         termsOfService,
         servers,
+        version = "1.0.0",
       } = options;
 
       const document = generator.generateDocument({
-        openapi: "3.0.0",
+        openapi: "3.1.0",
         info: {
           title,
-          version: "0.1.0",
+          version,
           description,
           contact,
           license,
@@ -31,6 +39,9 @@ export const createOpenApiJsonEndpoint = (
         },
         servers,
       });
+
+      // Not supported.
+      delete document.webhooks;
 
       return document;
     } catch (e) {

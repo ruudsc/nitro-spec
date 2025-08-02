@@ -12,6 +12,7 @@ export type RegisterRouteOptions = RouteMeta & {
   path: string;
   method: Method;
   contentType?: string;
+  __isCatchAll?: boolean;
 };
 
 export const registerRoute = (options: RegisterRouteOptions) => {
@@ -47,7 +48,7 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     responses: responses,
     request: {
       query: options.query,
-      params: pathParameters(options.path, options.operationId),
+      params: pathParameters(options.path, options.__isCatchAll ?? false),
       body: requestBody,
     },
   });
@@ -71,7 +72,7 @@ const generateRouteTags = (path: string) => {
   return [tags];
 };
 
-const pathParameters = (path: string, operationId: string) => {
+const pathParameters = (path: string, isCatchAll: boolean) => {
   const parameterNames: string[] = [];
 
   let anonymouseCounter = 0;
@@ -86,6 +87,10 @@ const pathParameters = (path: string, operationId: string) => {
   for (const match of paramMatches) {
     const name = match[1];
     parameterNames.push(name);
+  }
+
+  if (isCatchAll) {
+    parameterNames.push("path");
   }
 
   return z.object(

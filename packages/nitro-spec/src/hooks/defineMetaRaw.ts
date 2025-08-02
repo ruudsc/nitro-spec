@@ -10,20 +10,15 @@ import { RouteConfig } from "@asteasolutions/zod-to-openapi";
  */
 export function defineMetaRaw(meta: Omit<RouteConfig, "path" | "method">) {
   /** values injected by the rollup plugin */
-  const { __path, __method } = meta as unknown as {
-    __path: string;
-    __method: Method;
-  };
+  const { __path, __method, __isCatchAll, ...filteredMeta } =
+    meta as unknown as {
+      __path: string;
+      __method: Method;
+      __isCatchAll: boolean;
+    };
 
-  const copy = {
-    ...meta,
-    __path: undefined,
-    __method: undefined,
-    path: __path as any,
-    method: __method as any,
-  };
   registry.registerPath({
-    ...meta,
+    ...(filteredMeta as any),
     path: __path as any,
     method: __method as any,
   });

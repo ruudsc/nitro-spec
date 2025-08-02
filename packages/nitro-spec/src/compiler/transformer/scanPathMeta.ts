@@ -1,7 +1,6 @@
 import { dirname, join } from "pathe";
 import { filename as getFileName } from "pathe/utils";
 import {
-  catchAllRouteRegex,
   extractParams,
   fileExtensionRegex,
   getMethodFromFileName,
@@ -22,11 +21,12 @@ export type Meta = {
   fileRoute: string;
   urlRoute: string;
   method: string;
+  isCatchAll: boolean;
 };
 
 export const scanPathMeta = (path: string): Meta => {
   const relativePath = path.split("/routes/")?.[1];
-
+  const catchAllRegex = /\[\.{3}[^\]]+\]/g;
   if (!relativePath) {
     throw Error(`Invalid route path: ${path}`);
   }
@@ -40,11 +40,12 @@ export const scanPathMeta = (path: string): Meta => {
 
   const { routePart, method } = getMethodFromFileName(fileName);
   const fileRoute = join(dirname(noExt), routePart);
+  const isCatchall = catchAllRegex.test(fileRoute);
 
   const urlRoute = removeTrailingngSlash(
     replaceBrackets(fileRoute)
       .replace("index", "")
-      .replace(/\[\.{3}[^\]]+\]/g, "{path+}"),
+      .replace(catchAllRegex, "{path}"),
   );
 
   const pathParameters = extractParams(fileRoute);
@@ -53,8 +54,9 @@ export const scanPathMeta = (path: string): Meta => {
     id: path,
     filename: fileName,
     fileRoute: fileRoute,
-    urlRoute: urlRoute,
+    urlRoute: `/${urlRoute}`,
     pathParameters: pathParameters,
     method: method,
+    isCatchAll: isCatchall,
   };
 };
