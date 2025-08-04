@@ -21,4 +21,5 @@ export type OpenApiOptions = BaseOpenApiOptions & {
     url: string;
     description?: string;
   }[];
+  additionalJsonUrls?: string[];
 };
