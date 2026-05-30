@@ -1,4 +1,4 @@
-import { H3Event, createError, getQuery, getHeader } from "h3";
+import { H3Event, createError, getHeader } from "h3";
 import type { CustomMiddleware } from "nitro-spec";
 
 type Event = H3Event<Request>;
@@ -34,7 +34,7 @@ export interface RateLimitConfig {
  */
 export interface SecurityHeadersConfig {
   contentSecurityPolicy?: string;
-  xFrameOptions?: "DENY" | "SAMEORIGIN" | string;
+  xFrameOptions?: string;
   xContentTypeOptions?: boolean;
   referrerPolicy?: string;
   strictTransportSecurity?: string;
@@ -67,10 +67,7 @@ export function createCORSMiddleware(config: CORSConfig): CustomMiddleware {
       // Handle preflight requests
       if (method === "OPTIONS") {
         if (config.methods) {
-          event.node.res.setHeader(
-            "Access-Control-Allow-Methods",
-            config.methods.join(", "),
-          );
+          event.node.res.setHeader("Access-Control-Allow-Methods", config.methods.join(", "));
         }
 
         if (config.allowedHeaders) {
@@ -81,10 +78,7 @@ export function createCORSMiddleware(config: CORSConfig): CustomMiddleware {
         }
 
         if (config.maxAge) {
-          event.node.res.setHeader(
-            "Access-Control-Max-Age",
-            config.maxAge.toString(),
-          );
+          event.node.res.setHeader("Access-Control-Max-Age", config.maxAge.toString());
         }
 
         if (!config.preflightContinue) {
@@ -121,10 +115,7 @@ export function createCORSMiddleware(config: CORSConfig): CustomMiddleware {
 
       // Handle exposed headers
       if (config.exposedHeaders) {
-        event.node.res.setHeader(
-          "Access-Control-Expose-Headers",
-          config.exposedHeaders.join(", "),
-        );
+        event.node.res.setHeader("Access-Control-Expose-Headers", config.exposedHeaders.join(", "));
       }
     },
   };
@@ -135,17 +126,14 @@ export function createCORSMiddleware(config: CORSConfig): CustomMiddleware {
  */
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-export function createRateLimitMiddleware(
-  config: RateLimitConfig,
-): CustomMiddleware {
+export function createRateLimitMiddleware(config: RateLimitConfig): CustomMiddleware {
   return {
     type: "custom",
     name: "rate-limit",
     description: `Rate limit: ${config.maxRequests} requests per ${config.windowMs}ms`,
     handler: async (event: Event) => {
-      const key =
-        config.keyGenerator ?
-          config.keyGenerator(event)
+      const key = config.keyGenerator
+        ? config.keyGenerator(event)
         : event.node.req.socket.remoteAddress || "unknown";
 
       const now = Date.now();
@@ -161,18 +149,12 @@ export function createRateLimitMiddleware(
       }
 
       // Set rate limit headers
-      event.node.res.setHeader(
-        "X-RateLimit-Limit",
-        config.maxRequests.toString(),
-      );
+      event.node.res.setHeader("X-RateLimit-Limit", config.maxRequests.toString());
       event.node.res.setHeader(
         "X-RateLimit-Remaining",
         Math.max(0, config.maxRequests - record.count).toString(),
       );
-      event.node.res.setHeader(
-        "X-RateLimit-Reset",
-        Math.ceil(record.resetTime / 1000).toString(),
-      );
+      event.node.res.setHeader("X-RateLimit-Reset", Math.ceil(record.resetTime / 1000).toString());
 
       if (record.count > config.maxRequests) {
         if (config.onLimitReached) {
@@ -196,19 +178,14 @@ export function createRateLimitMiddleware(
 /**
  * Creates a security headers middleware
  */
-export function createSecurityHeadersMiddleware(
-  config: SecurityHeadersConfig,
-): CustomMiddleware {
+export function createSecurityHeadersMiddleware(config: SecurityHeadersConfig): CustomMiddleware {
   return {
     type: "custom",
     name: "security-headers",
     description: "Adds security headers to responses",
     handler: async (event: Event) => {
       if (config.contentSecurityPolicy) {
-        event.node.res.setHeader(
-          "Content-Security-Policy",
-          config.contentSecurityPolicy,
-        );
+        event.node.res.setHeader("Content-Security-Policy", config.contentSecurityPolicy);
       }
 
       if (config.xFrameOptions) {
@@ -224,10 +201,7 @@ export function createSecurityHeadersMiddleware(
       }
 
       if (config.strictTransportSecurity) {
-        event.node.res.setHeader(
-          "Strict-Transport-Security",
-          config.strictTransportSecurity,
-        );
+        event.node.res.setHeader("Strict-Transport-Security", config.strictTransportSecurity);
       }
 
       if (config.xXSSProtection) {
@@ -240,9 +214,7 @@ export function createSecurityHeadersMiddleware(
 /**
  * Creates a request filtering middleware
  */
-export function createRequestFilterMiddleware(
-  config: RequestFilterConfig,
-): CustomMiddleware {
+export function createRequestFilterMiddleware(config: RequestFilterConfig): CustomMiddleware {
   return {
     type: "custom",
     name: "request-filter",
@@ -252,11 +224,7 @@ export function createRequestFilterMiddleware(
       const userAgent = getHeader(event, "user-agent");
 
       // Check blocked IPs
-      if (
-        config.blockedIPs &&
-        clientIP &&
-        config.blockedIPs.includes(clientIP)
-      ) {
+      if (config.blockedIPs && clientIP && config.blockedIPs.includes(clientIP)) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden: IP blocked",
@@ -264,11 +232,7 @@ export function createRequestFilterMiddleware(
       }
 
       // Check allowed IPs (if specified, block all others)
-      if (
-        config.allowedIPs &&
-        clientIP &&
-        !config.allowedIPs.includes(clientIP)
-      ) {
+      if (config.allowedIPs && clientIP && !config.allowedIPs.includes(clientIP)) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden: IP not allowed",
@@ -305,9 +269,7 @@ export interface SignatureConfig {
   tolerance?: number; // Time tolerance in seconds
 }
 
-export function createSignatureValidator(
-  config: SignatureConfig,
-): CustomMiddleware {
+export function createSignatureValidator(config: SignatureConfig): CustomMiddleware {
   return {
     type: "custom",
     name: "signature-validator",
@@ -399,20 +361,14 @@ export function createDDoSProtection(config: DDoSConfig): CustomMiddleware {
       record.requests.push(now);
 
       // Check limits
-      if (
-        config.maxConcurrentRequests &&
-        record.concurrent > config.maxConcurrentRequests
-      ) {
+      if (config.maxConcurrentRequests && record.concurrent > config.maxConcurrentRequests) {
         throw createError({
           statusCode: 429,
           statusMessage: "Too many concurrent requests",
         });
       }
 
-      if (
-        config.maxRequestsPerWindow &&
-        record.requests.length > config.maxRequestsPerWindow
-      ) {
+      if (config.maxRequestsPerWindow && record.requests.length > config.maxRequestsPerWindow) {
         // Ban the IP
         record.banned = true;
         record.banEnd = now + (config.banDuration || 300000); // 5 minutes default

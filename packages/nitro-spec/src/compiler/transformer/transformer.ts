@@ -1,5 +1,6 @@
 import recast from "recast";
 import tsParser from "recast/parsers/typescript";
+
 import { Meta } from "./scanPathMeta";
 
 type ObjectProperty = recast.types.namedTypes.ObjectProperty;
@@ -15,16 +16,13 @@ export const transformer = (code: string, meta: Meta) => {
     visitCallExpression: function (path) {
       const isDefineMeta =
         "name" in path.node.callee &&
-        (path.node.callee.name === "defineMeta" ||
-          path.node.callee.name === "defineMetaRaw");
+        (path.node.callee.name === "defineMeta" || path.node.callee.name === "defineMetaRaw");
 
       if (!isDefineMeta) {
         return false;
       }
 
-      const argsNode = path.node.arguments.find(
-        (node) => node.type === "ObjectExpression",
-      );
+      const argsNode = path.node.arguments.find((node) => node.type === "ObjectExpression");
 
       if (!argsNode) {
         return false;

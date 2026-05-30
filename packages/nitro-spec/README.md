@@ -30,13 +30,15 @@ npm i unplugin-starter
 
 ```ts
 // vite.config.ts
-import Starter from 'unplugin-starter/vite'
+import Starter from "unplugin-starter/vite";
 
 export default defineConfig({
   plugins: [
-    Starter({ /* options */ }),
+    Starter({
+      /* options */
+    }),
   ],
-})
+});
 ```
 
 Example: [`playground/`](./playground/)
@@ -48,13 +50,15 @@ Example: [`playground/`](./playground/)
 
 ```ts
 // rollup.config.js
-import Starter from 'unplugin-starter/rollup'
+import Starter from "unplugin-starter/rollup";
 
 export default {
   plugins: [
-    Starter({ /* options */ }),
+    Starter({
+      /* options */
+    }),
   ],
-}
+};
 ```
 
 <br></details>
@@ -67,9 +71,11 @@ export default {
 module.exports = {
   /* ... */
   plugins: [
-    require('unplugin-starter/webpack')({ /* options */ })
-  ]
-}
+    require("unplugin-starter/webpack")({
+      /* options */
+    }),
+  ],
+};
 ```
 
 <br></details>
@@ -81,9 +87,14 @@ module.exports = {
 // nuxt.config.js
 export default defineNuxtConfig({
   modules: [
-    ['unplugin-starter/nuxt', { /* options */ }],
+    [
+      "unplugin-starter/nuxt",
+      {
+        /* options */
+      },
+    ],
   ],
-})
+});
 ```
 
 > This module works for both Nuxt 2 and [Nuxt Vite](https://github.com/nuxt/vite)
@@ -98,10 +109,12 @@ export default defineNuxtConfig({
 module.exports = {
   configureWebpack: {
     plugins: [
-      require('unplugin-starter/webpack')({ /* options */ }),
+      require("unplugin-starter/webpack")({
+        /* options */
+      }),
     ],
   },
-}
+};
 ```
 
 <br></details>
@@ -111,12 +124,12 @@ module.exports = {
 
 ```ts
 // esbuild.config.js
-import { build } from 'esbuild'
-import Starter from 'unplugin-starter/esbuild'
+import { build } from "esbuild";
+import Starter from "unplugin-starter/esbuild";
 
 build({
   plugins: [Starter()],
-})
+});
 ```
 
 <br></details>

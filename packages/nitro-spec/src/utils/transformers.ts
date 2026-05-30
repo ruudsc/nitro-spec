@@ -1,5 +1,6 @@
-import { ResponseTransformer } from "../hooks/defineMeta";
 import { H3Event } from "h3";
+
+import { ResponseTransformer } from "../hooks/defineMeta";
 
 /**
  * Field filtering transformer
@@ -14,21 +15,22 @@ export const createFieldFilterTransformer = (): ResponseTransformer<any> => {
       return response;
     }
 
-    const query = new URL(event.node.req.url || '', `http://${event.node.req.headers.host}`).searchParams;
-    const fields = query.get('fields');
-    
+    const query = new URL(event.node.req.url || "", `http://${event.node.req.headers.host}`)
+      .searchParams;
+    const fields = query.get("fields");
+
     if (!fields) {
       return response;
     }
 
-    const fieldsArray = fields.split(',').map(f => f.trim());
-    
+    const fieldsArray = fields.split(",").map((f) => f.trim());
+
     const filterObject = (obj: any): any => {
       if (Array.isArray(obj)) {
         return obj.map(filterObject);
       }
-      
-      if (obj && typeof obj === 'object') {
+
+      if (obj && typeof obj === "object") {
         const filtered: any = {};
         for (const field of fieldsArray) {
           if (field in obj) {
@@ -37,7 +39,7 @@ export const createFieldFilterTransformer = (): ResponseTransformer<any> => {
         }
         return filtered;
       }
-      
+
       return obj;
     };
 
@@ -53,10 +55,10 @@ export const createFieldFilterTransformer = (): ResponseTransformer<any> => {
  * Minimal format: returns the raw response
  */
 export const createResponseFormatTransformer = (
-  format: 'envelope' | 'minimal' = 'envelope'
+  format: "envelope" | "minimal" = "envelope",
 ): ResponseTransformer<any> => {
   return (response: any, event: H3Event<Request>, statusCode: number) => {
-    if (format === 'envelope') {
+    if (format === "envelope") {
       return {
         success: statusCode >= 200 && statusCode < 300,
         statusCode,
@@ -64,7 +66,7 @@ export const createResponseFormatTransformer = (
         timestamp: new Date().toISOString(),
       };
     }
-    
+
     return response;
   };
 };
@@ -74,7 +76,9 @@ export const createResponseFormatTransformer = (
  * Applies each transformer in sequence to the response.
  * Useful for combining field filtering, formatting, etc.
  */
-export const composeTransformers = (...transformers: ResponseTransformer<any>[]): ResponseTransformer<any> => {
+export const composeTransformers = (
+  ...transformers: ResponseTransformer<any>[]
+): ResponseTransformer<any> => {
   return (response: any, event: H3Event<Request>, statusCode: number) => {
     return transformers.reduce((acc, transformer) => {
       return transformer(acc, event, statusCode);

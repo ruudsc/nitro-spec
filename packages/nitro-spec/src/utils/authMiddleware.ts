@@ -3,7 +3,7 @@
 
 /** Custom middleware configuration */
 export type CustomMiddleware = {
-  type: 'custom';
+  type: "custom";
   name: string;
   handler: (event: any) => Promise<void> | void;
   description?: string;

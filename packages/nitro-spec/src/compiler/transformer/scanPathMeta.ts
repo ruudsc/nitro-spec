@@ -1,10 +1,7 @@
 import { dirname, join } from "pathe";
 import { filename as getFileName } from "pathe/utils";
-import {
-  extractParams,
-  fileExtensionRegex,
-  getMethodFromFileName,
-} from "./utils";
+
+import { extractParams, fileExtensionRegex, getMethodFromFileName } from "./utils";
 
 function removeTrailingngSlash(route: string): string {
   return route.replace(/\/$/, "");
@@ -43,9 +40,7 @@ export const scanPathMeta = (path: string): Meta => {
   const isCatchall = catchAllRegex.test(fileRoute);
 
   const urlRoute = removeTrailingngSlash(
-    replaceBrackets(fileRoute)
-      .replace("index", "")
-      .replace(catchAllRegex, "{path}"),
+    replaceBrackets(fileRoute).replace("index", "").replace(catchAllRegex, "{path}"),
   );
 
   const pathParameters = extractParams(fileRoute);

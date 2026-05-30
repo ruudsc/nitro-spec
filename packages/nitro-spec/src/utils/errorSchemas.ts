@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import { z } from "zod";
 
 // Ensure Zod is extended with OpenAPI functionality for v8 compatibility
 extendZodWithOpenApi(z);

@@ -6,10 +6,8 @@ export type OpenApiRoute = {
   description: string;
 };
 
-export const createOpenApiRoute = (
-  options: OpenApiRoute,
-): EventHandler<Request, unknown> =>
-  defineEventHandler((event) => {
+export const createOpenApiRoute = (options: OpenApiRoute): EventHandler<Request, unknown> =>
+  defineEventHandler((_event) => {
     const { description, title, baseUrl } = options;
 
     const scalarConfig = {
@@ -27,9 +25,7 @@ export const createOpenApiRoute = (
         <body>
           <script
             id="api-reference"
-            data-configuration="${JSON.stringify(scalarConfig)
-              .split('"')
-              .join("&quot;")}"
+            data-configuration="${JSON.stringify(scalarConfig).split('"').join("&quot;")}"
           ></script>
           <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
         </body>

@@ -8,8 +8,10 @@
     "dev": "nx run-many --targets=dev --output-style=stream",
     "playground": "nx run @nitro-app/test-project:dev",
     "lint": "nx run-many --targets=lint --output-style=stream",
-    "orval": "nx run-many --targets=orval --output-style=stream",
+    "lint:fix": "nx run-many --targets=lint:fix --output-style=stream",
     "format": "nx run-many --targets=format --output-style=stream",
+    "format:fix": "nx run-many --targets=format:fix --output-style=stream",
+    "orval": "nx run-many --targets=orval --output-style=stream",
     "reset": "nx reset"
   },
   "keywords": [],
@@ -22,7 +24,11 @@
     "pnpm": ">=10.0.0"
   },
   "devDependencies": {
-    "@nx/workspace": "20.4.6"
+    "@nx/workspace": "catalog:",
+    "oxlint": "catalog:",
+    "oxfmt": "catalog:",
+    "h3": "catalog:",
+    "oxlint-tsgolint": "catalog:"
   },
   "dependencies": {
     "nx": "^20.4.6"

@@ -113,10 +113,7 @@ const jwtAuth = createJWTAuthMiddleware({
 ### Basic Authentication
 
 ```typescript
-import {
-  createBasicAuthMiddleware,
-  hashPassword,
-} from "@nitro-spec/middlewares/auth";
+import { createBasicAuthMiddleware, hashPassword } from "@nitro-spec/middlewares/auth";
 
 // Hash passwords beforehand
 const hashedPassword = await hashPassword("user-password");
@@ -229,9 +226,7 @@ const rateLimit = createRateLimitMiddleware({
     return event.context.user?.id || event.node.req.socket.remoteAddress;
   },
   onLimitReached: (event) => {
-    console.log(
-      `Rate limit exceeded for ${event.node.req.socket.remoteAddress}`,
-    );
+    console.log(`Rate limit exceeded for ${event.node.req.socket.remoteAddress}`);
   },
 });
 ```
@@ -242,8 +237,7 @@ const rateLimit = createRateLimitMiddleware({
 import { createSecurityHeadersMiddleware } from "@nitro-spec/middlewares/security";
 
 const securityHeaders = createSecurityHeadersMiddleware({
-  contentSecurityPolicy:
-    "default-src 'self'; script-src 'self' 'unsafe-inline'",
+  contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'",
   xFrameOptions: "DENY",
   xContentTypeOptions: true,
   referrerPolicy: "strict-origin-when-cross-origin",
@@ -374,11 +368,7 @@ const rateLimitConfig = {
 All middleware is fully typed with TypeScript, providing excellent IntelliSense and type safety:
 
 ```typescript
-import type {
-  JWTConfig,
-  RateLimitConfig,
-  CORSConfig,
-} from "@nitro-spec/middlewares";
+import type { JWTConfig, RateLimitConfig, CORSConfig } from "@nitro-spec/middlewares";
 
 // Type-safe configuration
 const jwtConfig: JWTConfig = {

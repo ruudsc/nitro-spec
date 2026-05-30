@@ -1,10 +1,8 @@
-import {
-  OpenApiGeneratorV3,
-  OpenApiGeneratorV31,
-} from "@asteasolutions/zod-to-openapi";
+import { OpenApiGeneratorV3, OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
 import consola from "consola";
 import { createError, defineEventHandler, EventHandler } from "h3";
 import { merge, isErrorResult } from "openapi-merge";
+
 import { registry } from "../utils/registry";
 import { OpenApiOptions } from "./openApiOptions";
 
@@ -13,9 +11,8 @@ export const createOpenApiJsonEndpoint = (
 ): EventHandler<Request, unknown> =>
   defineEventHandler(async () => {
     try {
-      const generator =
-        options.openapi ?
-          new OpenApiGeneratorV31(registry.definitions)
+      const generator = options.openapi
+        ? new OpenApiGeneratorV31(registry.definitions)
         : new OpenApiGeneratorV3(registry.definitions);
 
       const {
@@ -25,7 +22,7 @@ export const createOpenApiJsonEndpoint = (
         license,
         termsOfService,
         servers,
-        version = "1.0.0",
+        version,
         additionalJsonUrls = [],
       } = options;
 
@@ -83,10 +80,7 @@ export const createOpenApiJsonEndpoint = (
         ]);
 
         if (isErrorResult(mergeResult)) {
-          consola.warn(
-            "Failed to merge OpenAPI documents:",
-            mergeResult.message,
-          );
+          consola.warn("Failed to merge OpenAPI documents:", mergeResult.message);
         } else {
           return mergeResult.output;
         }

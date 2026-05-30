@@ -1,8 +1,9 @@
 import { eventHandler } from "h3";
+
 import { OpenApiRoute } from "./openapi";
 
 export const CreateRedocRoute = (props: OpenApiRoute) =>
-  eventHandler((event) => {
+  eventHandler((_event) => {
     const title = "Redoc";
     const { baseUrl: url } = props;
 

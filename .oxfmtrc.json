@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortPackageJson": true,
+  "sortImports": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "singleQuote": false,
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.output/**",
+    "**/.nitro/**",
+    "**/coverage/**"
+  ]
+}

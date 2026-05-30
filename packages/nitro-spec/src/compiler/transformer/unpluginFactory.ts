@@ -1,13 +1,11 @@
 import type { UnpluginFactory } from "unplugin";
-
 import { createUnplugin } from "unplugin";
-import { scanPathMeta } from "./scanPathMeta";
+
 import { Options } from "../factories/types";
+import { scanPathMeta } from "./scanPathMeta";
 import { transformer } from "./transformer";
 
-export const unpluginFactory: UnpluginFactory<Options | undefined> = (
-  options,
-) => {
+export const unpluginFactory: UnpluginFactory<Options | undefined> = (_options) => {
   return {
     name: "nitro-openapi-plugin",
     sourcemap: false,
@@ -22,7 +20,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
     },
 
     async transform(code, id) {
-      const meta = await scanPathMeta(id);
+      const meta = scanPathMeta(id);
       const result = transformer(code, meta);
 
       return {

@@ -70,9 +70,7 @@ export interface CompressionConfig {
 /**
  * Creates a request logging middleware
  */
-export function createLoggingMiddleware(
-  config: LoggingConfig = {},
-): CustomMiddleware {
+export function createLoggingMiddleware(config: LoggingConfig = {}): CustomMiddleware {
   return {
     type: "custom",
     name: "request-logger",
@@ -131,9 +129,7 @@ export function createLoggingMiddleware(
 /**
  * Creates a request tracing middleware
  */
-export function createTracingMiddleware(
-  config: TracingConfig = {},
-): CustomMiddleware {
+export function createTracingMiddleware(config: TracingConfig = {}): CustomMiddleware {
   const headerName = config.headerName || "x-trace-id";
   const generateTraceId =
     config.generateTraceId ||
@@ -172,9 +168,7 @@ export function createTracingMiddleware(
 /**
  * Creates a cache control middleware
  */
-export function createCacheControlMiddleware(
-  config: CacheConfig,
-): CustomMiddleware {
+export function createCacheControlMiddleware(config: CacheConfig): CustomMiddleware {
   return {
     type: "custom",
     name: "cache-control",
@@ -187,8 +181,7 @@ export function createCacheControlMiddleware(
       if (config.noCache) directives.push("no-cache");
       if (config.noStore) directives.push("no-store");
       if (config.mustRevalidate) directives.push("must-revalidate");
-      if (config.maxAge !== undefined)
-        directives.push(`max-age=${config.maxAge}`);
+      if (config.maxAge !== undefined) directives.push(`max-age=${config.maxAge}`);
 
       if (directives.length > 0) {
         event.node.res.setHeader("Cache-Control", directives.join(", "));
@@ -199,15 +192,15 @@ export function createCacheControlMiddleware(
         event.node.res.on("finish", () => {
           // Simple ETag generation based on content length and last modified
           const contentLength = event.node.res.getHeader("content-length");
-          const lastModified =
-            event.node.res.getHeader("last-modified") || Date.now();
+          const lastModifiedRaw = event.node.res.getHeader("last-modified");
+          const lastModified = lastModifiedRaw
+            ? typeof lastModifiedRaw === "string"
+              ? new Date(lastModifiedRaw).getTime()
+              : lastModifiedRaw
+            : Date.now();
 
           if (contentLength) {
-            const etag = `"${contentLength}-${
-              typeof lastModified === "string" ?
-                new Date(lastModified).getTime()
-              : lastModified
-            }"`;
+            const etag = `"${String(contentLength)}-${String(lastModified)}"`;
             event.node.res.setHeader("ETag", etag);
           }
         });
@@ -256,9 +249,7 @@ export function createTimeoutMiddleware(timeoutMs: number): CustomMiddleware {
 /**
  * Creates a request ID middleware
  */
-export function createRequestIdMiddleware(
-  headerName = "x-request-id",
-): CustomMiddleware {
+export function createRequestIdMiddleware(headerName = "x-request-id"): CustomMiddleware {
   return {
     type: "custom",
     name: "request-id",
@@ -282,9 +273,7 @@ export interface HealthCheckConfig {
   }>;
 }
 
-export function createHealthCheckMiddleware(
-  config: HealthCheckConfig = {},
-): CustomMiddleware {
+export function createHealthCheckMiddleware(config: HealthCheckConfig = {}): CustomMiddleware {
   const path = config.path || "/health";
 
   return {
@@ -378,9 +367,7 @@ export interface MetricsConfig {
   }) => void;
 }
 
-export function createMetricsMiddleware(
-  config: MetricsConfig = {},
-): CustomMiddleware {
+export function createMetricsMiddleware(config: MetricsConfig = {}): CustomMiddleware {
   return {
     type: "custom",
     name: "metrics",

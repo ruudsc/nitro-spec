@@ -1,29 +1,17 @@
 import { join } from "node:path";
-import { cwd } from "node:process";
-import { readTSConfig, resolveTSConfig, TSConfig } from "pkg-types";
 
-export const catchAllRouteRegex =
-  /^(.*\/)?\[\.\.\.([a-zA-Z0-9_]+)\](\/.*)?\.(js|jsx|ts|tsx)$/;
+import { readTSConfig, resolveTSConfig } from "pkg-types";
+
+export const catchAllRouteRegex = /^(.*\/)?\[\.\.\.([a-zA-Z0-9_]+)\](\/.*)?\.(js|jsx|ts|tsx)$/;
 
 export const fileExtensionRegex = /\.[^/.]+$/;
 
-const methods = [
-  "get",
-  "post",
-  "put",
-  "delete",
-  "patch",
-  "head",
-  "options",
-  "trace",
-];
+const methods = ["get", "post", "put", "delete", "patch", "head", "options", "trace"];
 
 type Method = (typeof methods)[number];
 
 export const getMethodFromFileName = (fileName: string) => {
-  const method: Method | undefined = methods.find((method) =>
-    fileName.includes(method),
-  );
+  const method: Method | undefined = methods.find((method) => fileName.includes(method));
 
   if (!method) {
     return {
@@ -57,7 +45,6 @@ export type ImportAliases = Map<string, string[]>;
 export const getTypescriptAliases = async (path?: string) => {
   const aliases: ImportAliases = new Map<string, string[]>();
 
-  let paths = [] as any;
   let file = path ?? (await resolveTSConfig());
   const directory = file.split("/").slice(0, -1).join("/");
   const config = await readTSConfig(file);
@@ -66,8 +53,7 @@ export const getTypescriptAliases = async (path?: string) => {
   // console.log("tsconfig dir", directory);
 
   if (config.extends) {
-    const extendsArr =
-      Array.isArray(config.extends) ? config.extends : [config.extends];
+    const extendsArr = Array.isArray(config.extends) ? config.extends : [config.extends];
 
     for (const parentConfig of extendsArr) {
       const extendPath = join(directory, parentConfig);

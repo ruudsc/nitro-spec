@@ -104,10 +104,7 @@ The package seamlessly integrates with nitro-spec:
 
 ```typescript
 import { defineMeta } from "nitro-spec";
-import {
-  createJWTAuthMiddleware,
-  createRateLimitMiddleware,
-} from "@nitro-spec/middlewares";
+import { createJWTAuthMiddleware, createRateLimitMiddleware } from "@nitro-spec/middlewares";
 
 export const { defineEventHandler } = defineMeta(
   {

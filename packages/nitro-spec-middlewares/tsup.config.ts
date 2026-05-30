@@ -17,13 +17,5 @@ export default <Options>{
   splitting: true,
   bundle: true,
 
-  external: [
-    "h3",
-    "zod",
-    "nitro-spec",
-    "jsonwebtoken",
-    "bcryptjs",
-    "cors",
-    "helmet",
-  ],
+  external: ["h3", "zod", "nitro-spec", "jsonwebtoken", "bcryptjs", "cors", "helmet"],
 };

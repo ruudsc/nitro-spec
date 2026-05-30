@@ -1,16 +1,16 @@
 import { type NitroApp } from "nitropack";
+
+import { createOpenApiRoute } from "./routes/openapi";
 import { createOpenApiJsonEndpoint } from "./routes/openapi.json";
 import { createOpenapiYamlRoute } from "./routes/openapi.yaml";
-import { createOpenApiRoute } from "./routes/openapi";
 import { OpenApiOptions } from "./routes/openApiOptions";
 import { CreateRedocRoute } from "./routes/redoc";
 type NitroSpecOptions = OpenApiOptions & {
   app: NitroApp;
-  baseUrl?: string;
 };
 
 export const createNitroSpecPlugin = (args: NitroSpecOptions) => {
-  const { app, baseUrl = "/" } = args;
+  const { app, baseUrl } = args;
 
   const normalised = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
 
@@ -30,8 +30,7 @@ export const createNitroSpecPlugin = (args: NitroSpecOptions) => {
     createOpenApiRoute({
       baseUrl: `${normalised}/openapi.json`,
       title: args.title ?? "Nitro Server Routes",
-      description:
-        args.description ?? "OpenAPI documentation for Nitro Server Routes",
+      description: args.description ?? "OpenAPI documentation for Nitro Server Routes",
     }),
   );
 };

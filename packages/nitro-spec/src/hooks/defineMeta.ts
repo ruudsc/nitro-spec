@@ -1,5 +1,5 @@
-import { z } from "zod";
-import {CachedEventHandlerOptions} from  "nitropack"
+import consola from "consola";
+import { colors } from "consola/utils";
 // import {defineCachedEventHandler} from 'nitropack/runtime';
 import {
   H3Event,
@@ -12,19 +12,19 @@ import {
   _RequestMiddleware,
   EventHandlerObject,
 } from "h3";
+import { CachedEventHandlerOptions } from "nitropack";
+import { z } from "zod";
 
-import consola from "consola";
-import { colors } from "consola/utils";
-import { registerRoute, RouteRequestBodyType } from "../utils/registerRoute";
 import { isValidMethod, Method } from "../utils/isValidMethod";
 import { methodHasBody } from "../utils/methodHasBody";
+import { registerRoute, RouteRequestBodyType } from "../utils/registerRoute";
 
 type Event = H3Event<Request>;
 
 // Middleware types
 export type MiddlewareFunction = (event: Event) => Promise<void> | void;
 export type CustomMiddleware = {
-  type: 'custom';
+  type: "custom";
   name: string;
   handler: MiddlewareFunction;
   description?: string;
@@ -32,11 +32,7 @@ export type CustomMiddleware = {
 export type MiddlewareConfig = CustomMiddleware;
 
 // Response transformation types
-export type ResponseTransformer<TResponse> = (
-  response: any,
-  event: Event,
-  statusCode: number
-) => any;
+export type ResponseTransformer = (response: any, event: Event, statusCode: number) => any;
 
 // Error schema types
 export type ErrorSchema = {
@@ -82,7 +78,7 @@ export type RouteMeta<
   responses?: StatusCodeResponses;
   bodyContentType?: RouteRequestBodyType;
   middleware?: MiddlewareConfig[];
-  transformResponse?: ResponseTransformer<TResponse>;
+  transformResponse?: ResponseTransformer;
 };
 
 /**
@@ -122,12 +118,7 @@ export function defineMeta<
   TBodyData = z.infer<TBody>,
   TResponseData = TResponse extends z.ZodObject<z.ZodRawShape> ? z.infer<TResponse> : never,
 >(meta: RouteMeta<TPath, TQuery, TBody, TResponse>) {
-  const {
-    body,
-    query = z.object({}) as TQuery,
-    path = z.object({}) as TPath,
-    response = z.null(),
-  } = meta;
+  const { body, query = z.object({}) as TQuery, path = z.object({}) as TPath, response } = meta;
 
   /** values injected by the rollup plugin */
   const { __path, __method } = meta as unknown as {
@@ -136,8 +127,8 @@ export function defineMeta<
     __isCatchAll?: boolean;
   };
 
-  if (isValidMethod(__method) === false) {
-    throw new Error(`Invalid method: ${__method} for ${__path}`);
+  if (!isValidMethod(__method)) {
+    throw new Error(`Invalid method: ${String(__method)} for ${__path}`);
   }
 
   const operationId = meta.operationId || __path;
@@ -158,15 +149,15 @@ export function defineMeta<
   // Middleware execution function
   const executeMiddleware = async (middleware: MiddlewareConfig, event: Event, meta: any) => {
     try {
-      if (middleware.type === 'custom') {
+      if (middleware.type === "custom") {
         await middleware.handler(event);
       }
     } catch (error) {
       consola.error(meta.prefix, `Middleware error: ${middleware.type}`, error);
       throw createError({
         statusCode: 500,
-        statusMessage: 'Middleware Error',
-        data: error
+        statusMessage: "Middleware Error",
+        data: error,
       });
     }
   };
@@ -195,26 +186,25 @@ export function defineMeta<
       }
     }
 
-    const validatedQuery = await getValidatedQuery(event, query.parse).catch(
+    const validatedQuery = await getValidatedQuery(event, (data) => query.parse(data)).catch(
       (e) => {
         consola.error(meta.prefix, "Error validating query");
         consola.error(e);
       },
     );
 
-    const validatedParams = await getValidatedRouterParams(
-      event,
-      path.parse,
-    ).catch((e) => {
-      consola.error(meta.prefix, "Error validating params");
-      consola.error(e);
-    });
+    const validatedParams = await getValidatedRouterParams(event, (data) => path.parse(data)).catch(
+      (e) => {
+        consola.error(meta.prefix, "Error validating params");
+        consola.error(e);
+      },
+    );
     const hasBody = body && methodHasBody(event.method);
 
     let _validatedBody = undefined;
 
     if (hasBody) {
-      _validatedBody = await readValidatedBody(event, body.parse).catch((e) => {
+      _validatedBody = await readValidatedBody(event, (data) => body.parse(data)).catch((e) => {
         consola.error(meta.prefix, "Error validating body");
         consola.error(e);
       });
@@ -227,7 +217,7 @@ export function defineMeta<
     };
   };
 
-  const responseValidator: _ResponseMiddleware = (event, eventResponse) => {
+  const _responseValidator: _ResponseMiddleware = (event, eventResponse) => {
     const meta = getMeta(event);
     consola.log(meta.prefix, "Validating response");
 
@@ -244,7 +234,7 @@ export function defineMeta<
 
       if (responseSchema == null && eventResponse?.body != null) {
         throw Error(`Response is not null but no response schema found for status ${statusCode}`);
-      } else if (responseSchema != null && 'parse' in responseSchema) {
+      } else if (responseSchema != null && "parse" in responseSchema) {
         responseSchema.parse(eventResponse.body);
       } else {
         consola.debug("Response is null and response is not validated");
@@ -262,7 +252,7 @@ export function defineMeta<
       });
     }
   };
-  /* 
+  /*
   const wrappedHandler: Handler<TPathData, TQueryData, TBodyData, TResponseData> =  async (event: H3Event<EventHandlerRequest>) => {
     const { query, body, path } = await requestValidator(event);
 
@@ -273,7 +263,7 @@ export function defineMeta<
  */
   // Common handler wrapper that includes request validation, response validation, and transformation
   const createHandlerWrapper = (
-    handlerFn: HandlerFn<TPathData, TQueryData, TBodyData, TResponseData>
+    handlerFn: HandlerFn<TPathData, TQueryData, TBodyData, TResponseData>,
   ) => {
     return async (event: Event) => {
       const { query, body, path } = await requestValidator(event);
@@ -294,7 +284,7 @@ export function defineMeta<
 
         if (responseSchema == null && response != null) {
           throw Error(`Response is not null but no response schema found for status ${statusCode}`);
-        } else if (responseSchema != null && 'parse' in responseSchema) {
+        } else if (responseSchema != null && "parse" in responseSchema) {
           responseSchema.parse(response);
         }
 
@@ -315,18 +305,16 @@ export function defineMeta<
     };
   };
 
-  const _defineEventHandler = (
-    args: Handler<TPathData, TQueryData, TBodyData, TResponseData>,
-  ) => {
+  const _defineEventHandler = (args: Handler<TPathData, TQueryData, TBodyData, TResponseData>) => {
     const handlerFn = typeof args === "function" ? args : args.handler;
     const handlerWrapper = createHandlerWrapper(handlerFn);
 
     const beforeResponse =
-      typeof args === "object" && args.onBeforeResponse ?
-        Array.isArray(args.onBeforeResponse) ?
-          args.onBeforeResponse
-        : [args.onBeforeResponse]
-      : [];
+      typeof args === "object" && args.onBeforeResponse
+        ? Array.isArray(args.onBeforeResponse)
+          ? args.onBeforeResponse
+          : [args.onBeforeResponse]
+        : [];
 
     const handler = defineEventHandler({
       ...(typeof args === "object" ? args : undefined),
@@ -339,7 +327,7 @@ export function defineMeta<
 
   const _defineCachedEventHandler = (
     args: Handler<TPathData, TQueryData, TBodyData, TResponseData>,
-    cacheOptions?: CachedEventHandlerOptions
+    _cacheOptions?: CachedEventHandlerOptions,
   ) => {
     const handlerFn = typeof args === "function" ? args : args.handler;
     const handlerWrapper = createHandlerWrapper(handlerFn);
@@ -367,10 +355,7 @@ export type HandlerFn<TPath, TQuery, TBody, TResponse> = (
   Expand<TResponse extends z.ZodObject<z.ZodRawShape> ? z.infer<TResponse> : TResponse>
 >;
 
-export type HandlerObject<TPath, TQuery, TBody, TResponse> = Omit<
-  EventHandlerObject,
-  "handler"
-> & {
+export type HandlerObject<TPath, TQuery, TBody, TResponse> = Omit<EventHandlerObject, "handler"> & {
   handler: (
     event: Event,
     params: TPath,

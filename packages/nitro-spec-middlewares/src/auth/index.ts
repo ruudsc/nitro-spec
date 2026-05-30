@@ -1,6 +1,7 @@
+import bcrypt from "bcryptjs";
 import { H3Event, createError } from "h3";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+
 import type { AuthMiddleware, CustomMiddleware } from "../index";
 
 type Event = H3Event<Request>;
@@ -54,7 +55,7 @@ export function createJWTAuthMiddleware(config: JWTConfig): AuthMiddleware {
         // Set user context
         event.context.user = payload;
         return true;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -64,9 +65,7 @@ export function createJWTAuthMiddleware(config: JWTConfig): AuthMiddleware {
 /**
  * Creates a Basic authentication middleware
  */
-export function createBasicAuthMiddleware(
-  config: BasicAuthConfig,
-): AuthMiddleware {
+export function createBasicAuthMiddleware(config: BasicAuthConfig): AuthMiddleware {
   return {
     type: "auth",
     scheme: "basic",
@@ -92,7 +91,7 @@ export function createBasicAuthMiddleware(
         }
 
         return false;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -102,12 +101,8 @@ export function createBasicAuthMiddleware(
 /**
  * Creates an API Key authentication middleware
  */
-export function createApiKeyAuthMiddleware(
-  config: ApiKeyConfig,
-): AuthMiddleware {
-  const validKeys = new Set(
-    Array.isArray(config.keys) ? config.keys : [...config.keys],
-  );
+export function createApiKeyAuthMiddleware(config: ApiKeyConfig): AuthMiddleware {
+  const validKeys = new Set(Array.isArray(config.keys) ? config.keys : [...config.keys]);
 
   return {
     type: "auth",
@@ -125,10 +120,7 @@ export function createApiKeyAuthMiddleware(
 
       // Check query parameter
       if (config.query) {
-        const url = new URL(
-          event.node.req.url!,
-          `http://${event.node.req.headers.host}`,
-        );
+        const url = new URL(event.node.req.url!, `http://${event.node.req.headers.host}`);
         const queryValue = url.searchParams.get(config.query);
         if (queryValue && validKeys.has(queryValue)) {
           event.context.apiKey = queryValue;
@@ -185,7 +177,7 @@ export function createOAuth2Middleware(config: OAuth2Config): AuthMiddleware {
 
         event.context.user = result;
         return true;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -195,9 +187,7 @@ export function createOAuth2Middleware(config: OAuth2Config): AuthMiddleware {
 /**
  * Creates a custom role-based authorization middleware
  */
-export function createRoleAuthMiddleware(
-  requiredRoles: string[],
-): CustomMiddleware {
+export function createRoleAuthMiddleware(requiredRoles: string[]): CustomMiddleware {
   return {
     type: "custom",
     name: "role-auth",
@@ -213,9 +203,7 @@ export function createRoleAuthMiddleware(
       }
 
       const userRoles = user.roles || [];
-      const hasRequiredRole = requiredRoles.some((role) =>
-        userRoles.includes(role),
-      );
+      const hasRequiredRole = requiredRoles.some((role) => userRoles.includes(role));
 
       if (!hasRequiredRole) {
         throw createError({
@@ -230,10 +218,7 @@ export function createRoleAuthMiddleware(
 /**
  * Utility to hash passwords for Basic Auth
  */
-export async function hashPassword(
-  password: string,
-  saltRounds = 10,
-): Promise<string> {
+export async function hashPassword(password: string, saltRounds = 10): Promise<string> {
   return bcrypt.hash(password, saltRounds);
 }
 

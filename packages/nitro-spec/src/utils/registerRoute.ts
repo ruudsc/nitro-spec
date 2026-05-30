@@ -1,10 +1,11 @@
-import { registry } from "./registry";
-import { RouteMeta, ValidatorResponseTypes } from "../hooks/defineMeta";
-import { z } from "zod";
 import { ResponseConfig, ZodRequestBody } from "@asteasolutions/zod-to-openapi";
-import { Method } from "./isValidMethod";
 import consola from "consola";
+import { z } from "zod";
+
+import { RouteMeta, ValidatorResponseTypes } from "../hooks/defineMeta";
+import { Method } from "./isValidMethod";
 import { methodHasBody } from "./methodHasBody";
+import { registry } from "./registry";
 
 export type RouteRequestBodyType = "application/json" | "multipart/form-data";
 export type RegisterRouteOptions = RouteMeta & {
@@ -45,10 +46,7 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     !("_def" in options.response)
   ) {
     // Multiple response schemas by status code
-    const responsesByStatus = options.response as Record<
-      number,
-      ValidatorResponseTypes
-    >;
+    const responsesByStatus = options.response as Record<number, ValidatorResponseTypes>;
     for (const [statusCode, schema] of Object.entries(responsesByStatus)) {
       const code = parseInt(statusCode);
       const description = getStatusDescription(code);
@@ -56,10 +54,7 @@ export const registerRoute = (options: RegisterRouteOptions) => {
     }
   } else {
     // Single response schema (default to 200)
-    responses[200] = FormatOpenApiResponse(
-      "OK",
-      options.response as ValidatorResponseTypes,
-    );
+    responses[200] = FormatOpenApiResponse("OK", options.response as ValidatorResponseTypes);
   }
 
   // Add additional responses if specified
@@ -83,15 +78,15 @@ export const registerRoute = (options: RegisterRouteOptions) => {
   const bodyContentType = options.bodyContent ?? "application/json";
 
   const requestBody =
-    options.body && hasBody ?
-      ({
-        content: {
-          [bodyContentType]: {
-            schema: options.body,
+    options.body && hasBody
+      ? ({
+          content: {
+            [bodyContentType]: {
+              schema: options.body,
+            },
           },
-        },
-      } satisfies ZodRequestBody)
-    : undefined;
+        } satisfies ZodRequestBody)
+      : undefined;
 
   registry.registerPath({
     description: options.description,
@@ -148,9 +143,7 @@ const pathParameters = (path: string, isCatchAll: boolean) => {
     parameterNames.push("path");
   }
 
-  return z.object(
-    parameterNames.reduce((acc, name) => ({ ...acc, [name]: z.string() }), {}),
-  );
+  return z.object(parameterNames.reduce((acc, name) => ({ ...acc, [name]: z.string() }), {}));
 };
 
 export const FormatOpenApiResponse = (
