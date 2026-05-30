@@ -64,7 +64,7 @@ export default defineEventHandler(async (event, params, query, body) => {
 
   // Simulate post creation
   const now = new Date().toISOString();
-  const postId = `post-${Date.now()}`;
+  const postId = "550e8400-e29b-41d4-a716-446655440001";
 
   return {
     id: postId,

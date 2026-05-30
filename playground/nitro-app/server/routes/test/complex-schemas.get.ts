@@ -66,7 +66,7 @@ export default defineEventHandler(async (event, params, query, body) => {
 
   // Mock data generation
   const mockProducts = Array.from({ length: 50 }, (_, i) => ({
-    id: `product-${i + 1}`,
+    id: `550e8400-e29b-41d4-a716-${String(i + 1).padStart(12, "0")}`,
     name: `Product ${i + 1}`,
     description: `Description for product ${i + 1}`,
     price: Math.round((Math.random() * 100 + 10) * 100) / 100,

@@ -7,7 +7,9 @@ export const { defineEventHandler } = defineMeta({
   query: z
     .object({ id: z.string() })
     .meta({ id: "ApiV1TestFooposttsTestPath" }),
-  response: z.null().meta({ id: "ApiV1TestFooposttsTestResponse" }),
+  response: z
+    .object({ message: z.string() })
+    .meta({ id: "ApiV1TestFooposttsTestResponse" }),
   body: z
     .object({
       message: z.string(),
@@ -17,5 +19,5 @@ export const { defineEventHandler } = defineMeta({
 });
 
 export default defineEventHandler(() => {
-  return null;
+  return { message: "foo" };
 });

@@ -70,7 +70,7 @@ export const emptyQueryTest = defineEmptyQueryHandler(
     return {
       goals: [
         {
-          id: "goal-1",
+          id: "550e8400-e29b-41d4-a716-446655440101",
           title: "Emergency Fund",
           description: "Build up emergency savings",
           type: "savings" as const,
@@ -79,7 +79,7 @@ export const emptyQueryTest = defineEmptyQueryHandler(
           targetDate: "2024-12-31T23:59:59Z",
         },
         {
-          id: "goal-2",
+          id: "550e8400-e29b-41d4-a716-446655440102",
           title: "Learn TypeScript",
           type: "life" as const,
           targetAmount: 1,
@@ -103,7 +103,7 @@ export default defineConditionalQueryHandler(
     return {
       goals: [
         {
-          id: "goal-3",
+          id: "550e8400-e29b-41d4-a716-446655440103",
           title: "Travel Fund",
           description: "Save for vacation",
           type: "savings" as const,

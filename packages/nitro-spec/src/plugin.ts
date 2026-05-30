@@ -13,10 +13,28 @@ export const createNitroSpecPlugin = (args: NitroSpecOptions) => {
   const { app, baseUrl } = args;
 
   const normalised = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const router = (app as any).use ? app : (app as any).h3;
+  const registerGet = (path: string, handler: any) => {
+    if (typeof router.use === "function") {
+      router.use(path, handler);
+      return;
+    }
 
-  app.router.get(`${normalised}/openapi.json`, createOpenApiJsonEndpoint(args));
-  app.router.get(`${normalised}/openapi.yaml`, createOpenapiYamlRoute());
-  app.router.get(
+    if (typeof router.get === "function") {
+      router.get(path, handler);
+      return;
+    }
+
+    router["~middleware"].push(async (event: any) => {
+      if (event.req.method === "GET" && event.url.pathname === path) {
+        return handler(event);
+      }
+    });
+  };
+
+  registerGet(`${normalised}/openapi.json`, createOpenApiJsonEndpoint(args));
+  registerGet(`${normalised}/openapi.yaml`, createOpenapiYamlRoute());
+  registerGet(
     `${normalised}/openapi/redoc`,
     CreateRedocRoute({
       title: args.title ?? "Nitro Server Routes",
@@ -25,7 +43,7 @@ export const createNitroSpecPlugin = (args: NitroSpecOptions) => {
     }),
   );
 
-  app.router.get(
+  registerGet(
     `${normalised}/openapi`,
     createOpenApiRoute({
       baseUrl: `${normalised}/openapi.json`,
