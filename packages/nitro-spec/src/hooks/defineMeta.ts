@@ -60,6 +60,15 @@ export type StatusCodeResponses = {
   500?: ValidatorResponseTypes;
 } & Record<number, ValidatorResponseTypes>;
 
+export type ErrorConfig = {
+  /** How to handle Zod validation failures on query/params/body. Default: "managed" (returns 400 with issues). */
+  onRequestError?: "managed" | "throw";
+  /** How to handle errors thrown from the route handler. Default: "throw" (propagates to H3/Nitro). */
+  onHandlerError?: "managed" | "throw";
+  /** How to handle response schema mismatches. Default: "warn" (logs, passes through). */
+  onResponseError?: "warn" | "throw";
+};
+
 export type RouteMeta<
   TPath extends z.ZodObject<z.ZodRawShape> = z.ZodObject<z.ZodRawShape>,
   TQuery extends z.ZodObject<z.ZodRawShape> = z.ZodObject<z.ZodRawShape>,
@@ -78,7 +87,7 @@ export type RouteMeta<
   bodyContentType?: RouteRequestBodyType;
   middleware?: MiddlewareConfig[];
   transformResponse?: ResponseTransformer;
-};
+} & ErrorConfig;
 
 /**
  * Defines a type-safe Nitro/H3 route with OpenAPI metadata, Zod validation, and middleware support.
@@ -117,7 +126,15 @@ export function defineMeta<
   TBodyData = z.infer<TBody>,
   TResponseData = TResponse extends z.ZodObject<z.ZodRawShape> ? z.infer<TResponse> : never,
 >(meta: RouteMeta<TPath, TQuery, TBody, TResponse>) {
-  const { body, query = z.object({}) as TQuery, path = z.object({}) as TPath, response } = meta;
+  const {
+    body,
+    query = z.object({}) as TQuery,
+    path = z.object({}) as TPath,
+    response,
+    onRequestError = "managed",
+    onHandlerError = "throw",
+    onResponseError = "warn",
+  } = meta;
 
   /** values injected by the rollup plugin */
   const { __path, __method } = meta as unknown as {
@@ -185,28 +202,28 @@ export function defineMeta<
       }
     }
 
+    const handleRequestError = (field: string, e: unknown): undefined => {
+      consola.error(meta.prefix, `Error validating ${field}`);
+      consola.error(e);
+      if (onRequestError === "throw") throw e;
+      throw createError({ statusCode: 400, statusMessage: "Bad Request", data: e });
+    };
+
     const validatedQuery = await getValidatedQuery(event, (data) => query.parse(data)).catch(
-      (e) => {
-        consola.error(meta.prefix, "Error validating query");
-        consola.error(e);
-      },
+      (e) => handleRequestError("query", e),
     );
 
     const validatedParams = await getValidatedRouterParams(event, (data) => path.parse(data)).catch(
-      (e) => {
-        consola.error(meta.prefix, "Error validating params");
-        consola.error(e);
-      },
+      (e) => handleRequestError("params", e),
     );
-    const hasBody = body && methodHasBody(event.method);
 
+    const hasBody = body && methodHasBody(event.method);
     let _validatedBody = undefined;
 
     if (hasBody) {
-      _validatedBody = await readValidatedBody(event, (data) => body.parse(data)).catch((e) => {
-        consola.error(meta.prefix, "Error validating body");
-        consola.error(e);
-      });
+      _validatedBody = await readValidatedBody(event, (data) => body.parse(data)).catch(
+        (e) => handleRequestError("body", e),
+      );
     }
 
     return {
@@ -222,41 +239,48 @@ export function defineMeta<
   ) => {
     return async (event: Event) => {
       const { query, body, path } = await requestValidator(event);
-      const response = await handlerFn(event, path, query, body);
+
+      let response: Awaited<ReturnType<typeof handlerFn>>;
+      try {
+        response = await handlerFn(event, path, query, body);
+      } catch (e) {
+        if (onHandlerError === "throw") throw e;
+        consola.error(getMeta(event).prefix, "Unhandled handler error");
+        consola.error(e);
+        throw createError({ statusCode: 500, statusMessage: "Internal Server Error" });
+      }
 
       const meta = getMeta(event);
       const statusCode = event.node.res.statusCode || 200;
 
+      let responseSchema: ValidatorResponseTypes | null = null;
+      if (meta.responses && typeof meta.responses === "object" && meta.responses[statusCode]) {
+        responseSchema = meta.responses[statusCode] || null;
+      } else if (meta.response) {
+        responseSchema = meta.response as ValidatorResponseTypes;
+      }
+
       try {
-        let responseSchema: ValidatorResponseTypes | null = null;
-
-        // Use meta.responses if defined and has a schema for this status code
-        if (meta.responses && typeof meta.responses === "object" && meta.responses[statusCode]) {
-          responseSchema = meta.responses[statusCode] || null;
-        } else if (meta.response) {
-          responseSchema = meta.response as ValidatorResponseTypes;
-        }
-
         if (responseSchema == null && response != null) {
           throw Error(`Response is not null but no response schema found for status ${statusCode}`);
         } else if (responseSchema != null && "parse" in responseSchema) {
           responseSchema.parse(response);
         }
-
-        let transformedResponse = response;
-        if (meta.transformResponse && response != null) {
-          transformedResponse = meta.transformResponse(response, event, statusCode);
-        }
-
-        return transformedResponse;
       } catch (e) {
-        consola.error(meta.prefix, "Error validating response");
+        consola.error(meta.prefix, "Response schema mismatch");
         consola.error(JSON.stringify(e, null, 2));
-        throw createError({
-          statusCode: 500,
-          statusMessage: "Internal Server Error",
-        });
+        if (onResponseError === "throw") {
+          throw createError({ statusCode: 500, statusMessage: "Internal Server Error" });
+        }
+        // "warn" — log and fall through with the original response
       }
+
+      let transformedResponse = response;
+      if (meta.transformResponse && response != null) {
+        transformedResponse = meta.transformResponse(response, event, statusCode);
+      }
+
+      return transformedResponse;
     };
   };
 
