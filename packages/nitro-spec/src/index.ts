@@ -7,6 +7,7 @@ export { toZodResponse } from "./utils/toZodResponse ";
 export { createNitroSpecPlugin } from "./plugin";
 export { FormatOpenApiResponse } from "./utils/registerRoute";
 export { registry } from "./utils/registry";
+export { setNitroSpecPreload } from "./utils/preload";
 
 // New advanced features
 export * from "./utils/errorSchemas";

@@ -1,13 +1,21 @@
-import { OpenApiGeneratorV3, OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
+import {
+  OpenApiGeneratorV3,
+  OpenApiGeneratorV31,
+} from "@asteasolutions/zod-to-openapi";
 import consola from "consola";
 import { merge, isErrorResult } from "openapi-merge";
 
-import { registry } from "./registry";
 import { OpenApiOptions } from "../routes/openApiOptions";
+import { runNitroSpecPreload } from "./preload";
+import { registry } from "./registry";
 
-export const generateOpenApiDocument = async (options: OpenApiOptions) => {
-  const generator = options.openapi
-    ? new OpenApiGeneratorV31(registry.definitions)
+export const generateOpenApiDocument = async (
+  options: OpenApiOptions,
+): Promise<any> => {
+  await runNitroSpecPreload();
+  const generator =
+    options.openapi ?
+      new OpenApiGeneratorV31(registry.definitions)
     : new OpenApiGeneratorV3(registry.definitions);
 
   const {
@@ -34,7 +42,8 @@ export const generateOpenApiDocument = async (options: OpenApiOptions) => {
   const additionalDocs = await Promise.allSettled(
     additionalJsonUrls.map(async (url) => {
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+      if (!response.ok)
+        throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
       return await response.json();
     }),
   );
@@ -42,13 +51,18 @@ export const generateOpenApiDocument = async (options: OpenApiOptions) => {
   const validDocs = additionalDocs
     .map((result, index) => {
       if (result.status === "fulfilled") return result.value;
-      consola.warn(`Failed to fetch additional OpenAPI doc from ${additionalJsonUrls[index]}: ${(result as PromiseRejectedResult).reason}`);
+      consola.warn(
+        `Failed to fetch additional OpenAPI doc from ${additionalJsonUrls[index]}: ${(result as PromiseRejectedResult).reason}`,
+      );
       return null;
     })
     .filter(Boolean);
 
   if (validDocs.length > 0) {
-    const mergeResult = merge([{ oas: document }, ...validDocs.map((doc: any) => ({ oas: doc }))]);
+    const mergeResult = merge([
+      { oas: document },
+      ...validDocs.map((doc: any) => ({ oas: doc })),
+    ]);
     if (isErrorResult(mergeResult)) {
       consola.warn("Failed to merge OpenAPI documents:", mergeResult.message);
     } else {

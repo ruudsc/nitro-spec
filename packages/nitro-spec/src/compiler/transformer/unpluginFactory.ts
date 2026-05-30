@@ -3,19 +3,20 @@ import { createUnplugin } from "unplugin";
 
 import { Options } from "../factories/types";
 import { collectRouteFiles } from "./collectRouteFiles";
+import { injectPreload } from "./injectPreload";
 import { scanPathMeta } from "./scanPathMeta";
 import { transformer } from "./transformer";
 
-export const unpluginFactory: UnpluginFactory<Options | undefined> = (
-  options,
-) => {
+export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => {
   let routeFiles: string[] = [];
+  let isWatchMode = false;
 
   return {
     name: "nitro-openapi-plugin",
     sourcemap: false,
 
     buildStart() {
+      isWatchMode = (this as any).meta?.watchMode ?? false;
       routeFiles = collectRouteFiles(options?.routesDir);
     },
 
@@ -31,15 +32,11 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
         return { code: result.code, map: result.sourcemap };
       }
 
-      if (
-        id.includes("/plugins/") &&
-        code.includes("createNitroSpecPlugin") &&
-        routeFiles.length > 0
-      ) {
-        const imports = routeFiles
-          .map((f) => `import ${JSON.stringify(f)};`)
-          .join("\n");
-        return { code: `${imports}\n${code}` };
+      const isPluginFile = id.includes("/plugins/") && code.includes("createNitroSpecPlugin");
+      const shouldInject = isWatchMode || (options?.apiSpec?.enableInBuild ?? false);
+
+      if (isPluginFile && shouldInject && routeFiles.length > 0) {
+        return { code: injectPreload(code, routeFiles) };
       }
     },
   };

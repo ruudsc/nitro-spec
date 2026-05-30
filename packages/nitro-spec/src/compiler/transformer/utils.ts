@@ -70,7 +70,7 @@ export const getTypescriptAliases = async (path?: string) => {
   }
 
   if (config.compilerOptions?.paths) {
-    const entries = (paths = Object.entries(config.compilerOptions.paths));
+    const entries = Object.entries(config.compilerOptions.paths);
 
     for (const [alias, path] of entries) {
       const previousPaths = aliases.get(alias) ?? [];
