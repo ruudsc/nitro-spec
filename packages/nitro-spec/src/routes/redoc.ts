@@ -1,13 +1,15 @@
-import { eventHandler } from "h3";
+import { eventHandler, setResponseHeader } from "h3";
 
 import { OpenApiRoute } from "./openapi";
 
 export const CreateRedocRoute = (props: OpenApiRoute) =>
-  eventHandler((_event) => {
+  eventHandler((event) => {
     const title = "Redoc";
     const { baseUrl: url } = props;
 
-    return html`<!DOCTYPE html>
+    setResponseHeader(event, "content-type", "text/html; charset=UTF-8");
+
+    return `<!DOCTYPE html>
       <html lang="en">
         <head>
           <meta charset="utf-8" />
@@ -19,9 +21,5 @@ export const CreateRedocRoute = (props: OpenApiRoute) =>
           <redoc spec-url="${url}/openapi.json"></redoc>
           <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
         </body>
-      </html> `;
+      </html>`;
   });
-
-function html(str: any, ...args: any) {
-  return String.raw(str, ...args);
-}

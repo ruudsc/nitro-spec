@@ -1,6 +1,6 @@
 import { defineMeta } from "nitro-spec";
 import { z } from "nitro-spec";
-import { testResponse } from "~/models/models";
+import { testResponse } from "../../../../models/models";
 
 export const { defineEventHandler } = defineMeta({
   operationId: "getTest",

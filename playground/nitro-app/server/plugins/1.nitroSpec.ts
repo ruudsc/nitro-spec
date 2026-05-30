@@ -1,10 +1,11 @@
-import { z } from "nitro-spec";
+import { definePlugin } from "nitro";
 import { createNitroSpecPlugin } from "nitro-spec";
 
-export default (app: Parameters<typeof createNitroSpecPlugin>[0]["app"]) => {
+export default definePlugin((app) => {
   createNitroSpecPlugin({
     app,
     version: "1.0.0",
     baseUrl: "/api/",
+    logLevel: "verbose",
   });
-};
+});

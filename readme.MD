@@ -136,10 +136,6 @@ export default defineEventHandler(async (event, params, query, body) => {
 
 ## 🔧 Middleware System
 
-> **Note:** `@nitro-spec/middlewares` package is still in development and not yet stable.
-
-### Custom Middleware Example
-
 You can define your own middleware functions and use them with `defineMeta`. Custom middleware enables authentication, logging, validation, and more.
 
 ```typescript
@@ -164,23 +160,6 @@ const { defineEventHandler } = defineMeta({
 });
 ```
 
-### Custom Middleware
-
-```typescript
-import { createCustomMiddleware } from "@nitro-spec/middlewares";
-
-const auditMiddleware = createCustomMiddleware(
-  "audit-logger",
-  async (event) => {
-    const userId = event.context.user?.id;
-    const action = `${event.node.req.method} ${event.node.req.url}`;
-
-    await logAuditEvent({ userId, action, timestamp: new Date() });
-  },
-  "Logs user actions for compliance",
-);
-```
-
 ## 📖 Automatic Documentation
 
 Once configured, your API documentation is automatically available:
@@ -197,8 +176,7 @@ Once configured, your API documentation is automatically available:
 ```
 nitro-spec/
 ├── packages/
-│   ├── nitro-spec/              # Core library
-│   └── nitro-spec-middlewares/  # Middleware collection
+│   └── nitro-spec/              # Core library
 └── playground/
     └── nitro-app/              # Example application
 ```
@@ -244,17 +222,6 @@ export const ErrorSchemas = {
   404: z.object({ message: z.string() }).meta({ id: "NotFound" }),
   500: z.object({ error: z.string() }).meta({ id: "ServerError" }),
 };
-```
-
-### Reusable Middleware Stack
-
-```typescript
-// middleware/common.ts
-export const commonMiddleware = [
-  createLoggingMiddleware("api-logger"),
-  createCORSMiddleware({ origin: process.env.ALLOWED_ORIGINS?.split(",") }),
-  createRateLimitMiddleware({ windowMs: 60000, maxRequests: 100 }),
-];
 ```
 
 ## 📚 Ecosystem

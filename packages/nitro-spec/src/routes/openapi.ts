@@ -1,4 +1,4 @@
-import { defineEventHandler, EventHandler } from "h3";
+import { defineEventHandler, EventHandler, setResponseHeader } from "h3";
 
 export type OpenApiRoute = {
   baseUrl: string;
@@ -7,14 +7,16 @@ export type OpenApiRoute = {
 };
 
 export const createOpenApiRoute = (options: OpenApiRoute): EventHandler<Request, unknown> =>
-  defineEventHandler((_event) => {
+  defineEventHandler((event) => {
     const { description, title, baseUrl } = options;
 
     const scalarConfig = {
       spec: { url: baseUrl },
     };
 
-    return html`<!doctype html>
+    setResponseHeader(event, "content-type", "text/html; charset=UTF-8");
+
+    return `<!doctype html>
       <html lang="en">
         <head>
           <meta charset="utf-8" />
@@ -31,7 +33,3 @@ export const createOpenApiRoute = (options: OpenApiRoute): EventHandler<Request,
         </body>
       </html>`;
   });
-
-function html(str: any, ...args: any) {
-  return String.raw(str, ...args);
-}
