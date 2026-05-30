@@ -1,8 +1,11 @@
 {
   "name": "nitro-spec",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "license": "MIT",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "typesVersions": {
     "*": {
       "*": [

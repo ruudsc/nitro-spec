@@ -6,19 +6,23 @@
 
 Create the OpenAPI plugin at `server/plugins/nitroSpec.ts`:
 
-````typescript
+```typescript
+import "virtual:nitro-spec/preload";
 import { createNitroSpecPlugin } from "nitro-spec";
+import { definePlugin } from "nitro";
 
-export default defineNitroPlugin((app) => {
+export default definePlugin((app) => {
   createNitroSpecPlugin({
     app,
-    version: "1.0.0",
-    title: "My API",
-    description: "Type-safe API with automatic documentation",
     baseUrl: "/api",
+    title: "Nitro API",
+    description: "OpenAPI documentation for the backend",
+    version: "1.0.0",
   });
 });
 ```
+
+**Important:** The `import "virtual:nitro-spec/preload";` line must be included at the top of your plugin file to properly initialize the nitro-spec plugin system.
 
 ### Your First Route
 
@@ -254,25 +258,3 @@ export const commonMiddleware = [
 ```
 
 ## 📚 Ecosystem
-
-## 🆕 Migration from v7
-
-If you're upgrading from `@asteasolutions/zod-to-openapi` v7:
-
-```typescript
-// Before (v7)
-const UserSchema = z
-  .object({
-    id: z.string(),
-    name: z.string(),
-  })
-  .openapi("User");
-
-// After (v8)
-const UserSchema = z
-  .object({
-    id: z.string(),
-    name: z.string(),
-  })
-  .meta({ id: "User" });
-```
