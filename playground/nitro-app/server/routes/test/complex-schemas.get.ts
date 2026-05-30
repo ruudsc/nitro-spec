@@ -61,7 +61,7 @@ const { defineEventHandler } = defineMeta({
   response: ProductListResponseSchema,
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   const { page, limit, search, sortBy, sortOrder } = query;
 
   // Mock data generation

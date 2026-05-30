@@ -61,7 +61,7 @@ const { defineEventHandler } = defineMeta({
 });
 
 // Fully typed handler with automatic validation
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   // query is typed: { search?: string, limit: number, offset: number }
   const users = await getUsersFromDatabase(query);
 
@@ -117,11 +117,11 @@ const { defineEventHandler } = defineMeta({
   },
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
-  // params.id is typed as string and validated as UUID
+export default defineEventHandler(async ({ event, path, query, body }) => {
+  // path.id is typed as string and validated as UUID
   // body is typed as Partial<UpdateUserRequest> and validated
 
-  const user = await updateUser(params.id, body);
+  const user = await updateUser(path.id, body);
 
   if (!user) {
     throw createError({

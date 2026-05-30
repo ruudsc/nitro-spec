@@ -112,7 +112,7 @@ export type RouteMeta<
  *   transformResponse: createResponseFormatTransformer(),
  * });
  *
- * export default defineEventHandler(async (event, params, query, body) => {
+ * export default defineEventHandler(async ({ event, path, query, body }) => {
  *   // ...handler logic...
  * });
  */
@@ -242,7 +242,7 @@ export function defineMeta<
 
       let response: Awaited<ReturnType<typeof handlerFn>>;
       try {
-        response = await handlerFn(event, path, query, body);
+        response = await handlerFn({ event, path, query, body });
       } catch (e) {
         if (onHandlerError === "throw") throw e;
         consola.error(getMeta(event).prefix, "Unhandled handler error");
@@ -325,21 +325,22 @@ export function defineMeta<
 
 export type MaybePromise<T> = T | Promise<T>;
 
+export type HandlerContext<TPath, TQuery, TBody> = {
+  event: Event;
+  path: TPath;
+  query: TQuery;
+  body: TBody;
+};
+
 export type HandlerFn<TPath, TQuery, TBody, TResponse> = (
-  event: Event,
-  params: TPath,
-  query: TQuery,
-  body: TBody,
+  context: HandlerContext<TPath, TQuery, TBody>,
 ) => MaybePromise<
   Expand<TResponse extends z.ZodObject<z.ZodRawShape> ? z.infer<TResponse> : TResponse>
 >;
 
 export type HandlerObject<TPath, TQuery, TBody, TResponse> = Omit<EventHandlerObject, "handler"> & {
   handler: (
-    event: Event,
-    params: TPath,
-    query: TQuery,
-    body: TBody,
+    context: HandlerContext<TPath, TQuery, TBody>,
   ) => MaybePromise<
     Expand<TResponse extends z.ZodObject<z.ZodRawShape> ? z.infer<TResponse> : TResponse>
   >;

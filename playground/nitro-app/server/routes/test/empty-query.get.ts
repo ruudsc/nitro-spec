@@ -65,7 +65,7 @@ const { defineEventHandler: defineConditionalQueryHandler } = defineMeta({
 
 // Export the empty query test
 export const emptyQueryTest = defineEmptyQueryHandler(
-  async (event, params, query, body) => {
+  async ({ event, path, query, body }) => {
     // Mock data since no query parameters are expected
     return {
       goals: [
@@ -98,7 +98,7 @@ export const emptyQueryTest = defineEmptyQueryHandler(
 
 // Export the conditional query test (default export)
 export default defineConditionalQueryHandler(
-  async (event, params, query, body) => {
+  async ({ event, path, query, body }) => {
     // Same mock data - no query parameters are processed since object is empty
     return {
       goals: [

@@ -59,7 +59,7 @@ const { defineEventHandler } = defineMeta({
   response: PostResponseSchema,
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   const { title, content, tags, category, publishAt, metadata } = body;
 
   // Simulate post creation

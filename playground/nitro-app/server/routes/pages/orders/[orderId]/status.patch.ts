@@ -46,8 +46,8 @@ const { defineEventHandler } = defineMeta({
   response: OrderSchema,
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
-  const { orderId } = params;
+export default defineEventHandler(async ({ event, path, query, body }) => {
+  const { orderId } = path;
   const { status, notes } = body;
 
   // Simulate async database operation

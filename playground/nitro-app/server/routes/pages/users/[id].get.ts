@@ -112,8 +112,8 @@ const mockUsers = new Map([
   ],
 ]);
 
-export default defineEventHandler(async (event, params, query, body) => {
-  const { id } = params;
+export default defineEventHandler(async ({ event, path, query, body }) => {
+  const { id } = path;
 
   // Simulate async database lookup
   await new Promise((resolve) => setTimeout(resolve, 50));

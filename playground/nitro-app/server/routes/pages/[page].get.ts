@@ -10,8 +10,8 @@ const { defineEventHandler } = defineMeta({
   }),
 });
 
-export default defineEventHandler((event, params) => {
-  const { page } = params;
+export default defineEventHandler(({ event, path }) => {
+  const { page } = path;
 
   // Simulate fetching page data
   const pageData = {

@@ -73,7 +73,7 @@ const { defineEventHandler } = defineMeta({
     .meta({ id: "TestMixed-metadatagettsMixedFieldTestResponse" }),
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   const { token, userId, includeMetadata, format, filters } = query;
 
   return {

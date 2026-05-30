@@ -46,8 +46,8 @@ const { defineEventHandler } = defineMeta({
   },
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
-  const { id } = params;
+export default defineEventHandler(async ({ event, path, query, body }) => {
+  const { id } = path;
   const { forceError } = query;
 
   // Test different response scenarios

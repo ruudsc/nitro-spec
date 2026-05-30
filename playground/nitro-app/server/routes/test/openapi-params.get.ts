@@ -48,7 +48,7 @@ const { defineEventHandler } = defineMeta({
     .meta({ id: "TestOpenapi-paramsgettsOpenApiParamsTestResponse" }),
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   return {
     message: "OpenAPI parameter metadata was automatically fixed!",
     receivedParams: {

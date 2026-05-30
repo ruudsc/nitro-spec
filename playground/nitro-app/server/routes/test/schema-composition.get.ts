@@ -71,7 +71,7 @@ const { defineEventHandler } = defineMeta({
   response: DataResponseSchema,
 });
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   const startTime = Date.now();
   const { sessionId, version, debug } = query;
 

@@ -76,7 +76,7 @@ const existingEmails = new Set([
   "bob@example.com",
 ]);
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   // Check if email already exists
   if (existingEmails.has(body.email)) {
     throw new Error(`User with email ${body.email} already exists`);

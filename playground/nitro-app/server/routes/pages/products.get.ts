@@ -139,7 +139,7 @@ const mockProducts = [
   },
 ];
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   let filteredProducts = [...mockProducts];
 
   // Apply filters

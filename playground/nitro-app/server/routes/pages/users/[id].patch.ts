@@ -92,8 +92,8 @@ const mockUsers = new Map([
   ],
 ]);
 
-export default defineEventHandler(async (event, params, query, body) => {
-  const { id } = params;
+export default defineEventHandler(async ({ event, path, query, body }) => {
+  const { id } = path;
 
   // Check if user exists
   const existingUser = mockUsers.get(id);

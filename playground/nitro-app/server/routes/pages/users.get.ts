@@ -101,7 +101,7 @@ const mockUsers = [
   },
 ];
 
-export default defineEventHandler(async (event, params, query, body) => {
+export default defineEventHandler(async ({ event, path, query, body }) => {
   const { page, limit, role, search } = query;
 
   // Filter users based on query parameters

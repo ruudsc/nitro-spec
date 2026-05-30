@@ -60,7 +60,7 @@ async function calculateUserStats() {
 
 // Using defineCachedEventHandler with cache options
 export default defineCachedEventHandler(
-  async (event, params, query, body) => {
+  async ({ event, path, query, body }) => {
     console.log("Calculating user statistics...");
     return await calculateUserStats();
   },
