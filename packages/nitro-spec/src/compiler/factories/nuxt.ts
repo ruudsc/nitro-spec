@@ -9,8 +9,8 @@ export interface ModuleOptions extends Options {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: "nuxt-unplugin-starter",
-    configKey: "unpluginStarter",
+    name: "nitro-spec",
+    configKey: "nitroSpec",
   },
   defaults: {
     // ...default options

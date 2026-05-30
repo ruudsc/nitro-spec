@@ -1,6 +1,6 @@
 {
   "name": "nitro-spec",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "license": "MIT",
   "type": "module",
   "typesVersions": {
@@ -41,28 +41,47 @@
       "require": "./dist/compiler/factories/nuxt.cjs",
       "import": "./dist/compiler/factories/nuxt.js"
     },
+    "./rolldown": {
+      "types": "./dist/compiler/factories/rolldown.d.ts",
+      "require": "./dist/compiler/factories/rolldown.cjs",
+      "import": "./dist/compiler/factories/rolldown.js"
+    },
+    "./rspack": {
+      "types": "./dist/compiler/factories/rspack.d.ts",
+      "require": "./dist/compiler/factories/rspack.cjs",
+      "import": "./dist/compiler/factories/rspack.js"
+    },
+    "./farm": {
+      "types": "./dist/compiler/factories/farm.d.ts",
+      "require": "./dist/compiler/factories/farm.cjs",
+      "import": "./dist/compiler/factories/farm.js"
+    },
     "./types": {
       "import": "./dist/types.js"
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "clean": "rm -rf .nuxt .output node_modules",
-    "dev": "tsup --watch src",
+    "dev": "tsdown --watch src",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
     "format": "oxfmt --check .",
     "format:fix": "oxfmt --write .",
     "play": "npm -C playground run dev",
     "prepublishOnly": "npm run build",
+    "publish:local": "pnpm run build && pnpm publish --no-git-checks",
     "release": "bumpp && pnpm publish",
-    "start": "tsx src/index.ts"
+    "start": "tsx src/index.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "catalog:",
     "escodegen": "^2.1.0",
     "openapi-merge": "^1.3.3",
-    "unplugin": "^2.1.2",
+    "unplugin": "^3.0.0",
     "yaml": "2.7.0"
   },
   "devDependencies": {
@@ -75,7 +94,7 @@
     "nodemon": "^3.1.10",
     "openapi3-ts": "^4.5.0",
     "rollup": "^4.46.2",
-    "tsup": "^8.5.0",
+    "tsdown": "^0.12.0",
     "tsx": "^4.20.3",
     "typescript": "catalog:",
     "vite": "^7.0.6",

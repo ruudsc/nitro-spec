@@ -9,7 +9,7 @@ import { ResponseTransformer } from "../hooks/defineMeta";
  *
  * Example: ?fields=id,name
  */
-export const createFieldFilterTransformer = (): ResponseTransformer<any> => {
+export const createFieldFilterTransformer = (): ResponseTransformer => {
   return (response: any, event: H3Event<Request>, statusCode: number) => {
     if (statusCode !== 200) {
       return response;
@@ -56,7 +56,7 @@ export const createFieldFilterTransformer = (): ResponseTransformer<any> => {
  */
 export const createResponseFormatTransformer = (
   format: "envelope" | "minimal" = "envelope",
-): ResponseTransformer<any> => {
+): ResponseTransformer => {
   return (response: any, event: H3Event<Request>, statusCode: number) => {
     if (format === "envelope") {
       return {
@@ -77,8 +77,8 @@ export const createResponseFormatTransformer = (
  * Useful for combining field filtering, formatting, etc.
  */
 export const composeTransformers = (
-  ...transformers: ResponseTransformer<any>[]
-): ResponseTransformer<any> => {
+  ...transformers: ResponseTransformer[]
+): ResponseTransformer => {
   return (response: any, event: H3Event<Request>, statusCode: number) => {
     return transformers.reduce((acc, transformer) => {
       return transformer(acc, event, statusCode);

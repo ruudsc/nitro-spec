@@ -11,7 +11,9 @@ const methods = ["get", "post", "put", "delete", "patch", "head", "options", "tr
 type Method = (typeof methods)[number];
 
 export const getMethodFromFileName = (fileName: string) => {
-  const method: Method | undefined = methods.find((method) => fileName.includes(method));
+  const method: Method | undefined = methods.find((method) =>
+    new RegExp(`\\.${method}$`, "i").test(fileName),
+  );
 
   if (!method) {
     return {
@@ -20,11 +22,11 @@ export const getMethodFromFileName = (fileName: string) => {
     };
   }
 
-  const routePart = fileName.replace("." + method, "");
+  const routePart = fileName.replace(new RegExp(`\\.${method}$`, "i"), "");
 
   return {
     method,
-    routePart: routePart,
+    routePart,
   };
 };
 

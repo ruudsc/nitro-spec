@@ -1,6 +1,6 @@
-import type { Options } from "tsup";
+import { defineConfig } from "tsdown";
 
-export default <Options>{
+export default defineConfig({
   entry: ["src/compiler/factories/*.ts", "src/index.ts"],
   clean: true,
   format: ["esm", "cjs"],
@@ -8,8 +8,6 @@ export default <Options>{
 
   sourcemap: true,
   minify: false,
-  splitting: true,
-  bundle: true,
 
   external: [
     "recast",
@@ -25,4 +23,4 @@ export default <Options>{
     "vite",
     "webpack",
   ],
-};
+});

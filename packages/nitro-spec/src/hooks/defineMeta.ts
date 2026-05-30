@@ -6,7 +6,6 @@ import {
   getValidatedQuery,
   getValidatedRouterParams,
   readValidatedBody,
-  _ResponseMiddleware,
   createError,
   defineEventHandler,
   _RequestMiddleware,
@@ -217,50 +216,6 @@ export function defineMeta<
     };
   };
 
-  const _responseValidator: _ResponseMiddleware = (event, eventResponse) => {
-    const meta = getMeta(event);
-    consola.log(meta.prefix, "Validating response");
-
-    try {
-      const statusCode = event.node.res.statusCode || 200;
-      let responseSchema: ValidatorResponseTypes | null = null;
-
-      // Use meta.responses if defined and has a schema for this status code
-      if (meta.responses && typeof meta.responses === "object" && meta.responses[statusCode]) {
-        responseSchema = meta.responses[statusCode] || null;
-      } else if (meta.response) {
-        responseSchema = meta.response as ValidatorResponseTypes;
-      }
-
-      if (responseSchema == null && eventResponse?.body != null) {
-        throw Error(`Response is not null but no response schema found for status ${statusCode}`);
-      } else if (responseSchema != null && "parse" in responseSchema) {
-        responseSchema.parse(eventResponse.body);
-      } else {
-        consola.debug("Response is null and response is not validated");
-      }
-
-      if (meta.transformResponse && eventResponse?.body != null) {
-        eventResponse.body = meta.transformResponse(eventResponse.body, event, statusCode);
-      }
-    } catch (e) {
-      consola.error(meta.prefix, "Error validating response");
-      consola.error(JSON.stringify(e, null, 2));
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Internal Server Error",
-      });
-    }
-  };
-  /*
-  const wrappedHandler: Handler<TPathData, TQueryData, TBodyData, TResponseData> =  async (event: H3Event<EventHandlerRequest>) => {
-    const { query, body, path } = await requestValidator(event);
-
-    const response = await handler(event, path, query, body);
-
-    responseValidator(event, response);
-  }
- */
   // Common handler wrapper that includes request validation, response validation, and transformation
   const createHandlerWrapper = (
     handlerFn: HandlerFn<TPathData, TQueryData, TBodyData, TResponseData>,
